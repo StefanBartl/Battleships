@@ -1,0 +1,265 @@
+/* #region Table of Content */
+/*    
+!                        Battleships Main-CSS-Stylesheet
+?                                    powered by
+!                                     Stefan Bartl
+!                      (WKDSteVIE / WKDMinerva)
+?                                          2022                                                                                                                                                                        
+?                  ________________________________                                                                                                                                                                                                  
+!                                   Table of Content
+?                                     -) CSS-Setup                                                                                                
+?                                     -) General-Design
+?                                     -) header | .navlist
+?                                     -) Pseudelements
+?                                     -) Transitions
+.                                        - header   
+?                                     -) Animations
+?                                     -) Media Queries
+.                                        - small devices
+?                                   10) Jobs to-do   
+todo                CSS - What a wonderful & tricky language !                                                                                                                                                                                                                                                                                                                                                                 */
+/*#endregion*/
+
+
+/* #region jobs to-do */
+
+/*
+todo  
+*/      
+
+/* #endregion */
+
+
+/*#region  CSS-Setup */
+
+/*? ===  font(s) === */
+
+/* futura: font-family: futura-pt,sans-serif; */
+@import url("https://use.typekit.net/izw3hmc.css");
+
+/* #region setup & themes  */
+
+:root {
+
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  --font-futura: futura-pt,sans-serif;
+  font-weight: 400;
+  font-style: normal; 
+
+  --fs-400: 1rem;
+  --fs-500: 1.125rem;
+  --fs-600: 1.375rem;
+  --fs-700: 2rem;
+
+  /* ! test that out if it is working */
+  @media (min-width: 45em){
+  --fs-400: 1.125rem;
+  --fs-500: 1.375rem;
+  --fs-600: 2.75rem;
+  --fs-700: 4.125rem;
+  }
+
+  /* ==================  
+?    ===  Colour-Palette  ===
+.     ================== */
+  --wkd-black: rgb(0, 0, 0);
+  --wkd-darkgrey: rgb(29, 29, 29);
+  --wkd-midgrey: rgb(61, 61, 61);
+  --wkd-grey: rgb(107, 106, 106);
+  --wkd-lightgrey: rgb(178, 182, 160);
+  --wkd-white: rgb(255, 255, 255);
+  --wkd-red: rgb(255, 0, 0);
+  --wkd-green: rgb(82, 150, 34);
+  --wkd-intense-blue: rgb(0, 0, 250);
+  --wkd-pastell-blue: rgb(25, 145, 210);
+  --wkd-torquise: rgb(8, 253, 216);
+  --wkd-blueviolett: rgb(21, 23, 76);
+  --wkd-yellow: rgb(255, 255, 0);
+  --wkd-yellow-dark: rgb(255, 183, 0);
+  --wkd-orange: rgb(255, 102, 0); /* filter: brightness(0) saturate(100%) invert(44%) sepia(24%) saturate(4068%) hue-rotate(1deg) brightness(98%) contrast(106%); */
+  --wkd-grapefruit: rgb(239, 95, 87);
+  --wkd-pink: rgb(255, 0, 128);
+  --wkd-pinkviolett: rgb(255, 0, 255);  /* filter: brightness(0) saturate(100%) invert(19%) sepia(63%) saturate(4179%) hue-rotate(293deg) brightness(123%) contrast(136%); */
+  --wkd-darkviolett: rgb(102, 0, 102); 
+  --wkd-manner: rgb(235, 184, 173);
+}
+
+:root.theme_prime{
+
+/*? === design === */
+--main-colour: var(--wkd-intense-blue);
+--counter-colour: var(--wkd-grey);
+--design-strokes-colour: var(--wkd-orange);
+--design-strokes-accent-colour: var(--wkd-pinkviolett);
+--shadows: var(--wkd-white);
+
+/*? === text === */
+--text-optimal-width: clamp(45ch, 50%, 75ch);
+--text-main-colour: var(--wkd-white);
+--link-hover-color: var(--wkd-red);
+}
+
+/* #endregion */
+
+/* #region resets */
+
+/* box-sizing */
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box; /* Opera/IE 8+ */
+}
+
+/* margins */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+figure,
+picture {
+  margin: 0;
+}
+
+/* set up the body*/
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* make form elements easier to work with */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* remove animations for people who turned them off*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* #endregion */
+
+/* #endregion */
+
+
+/* #region General-Design */
+
+body {
+  background-color: var(--main-colour);
+  color: var(--text-main-colour);
+  font-family: var(--font-futura);
+}
+
+/* #endregion */
+
+
+/* #region Start-Page */
+
+.start-page-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10%;
+}
+
+.language-translate {
+  text-align: center;
+}
+
+.page-headline {
+  text-align: center;
+  font-size: 4rem;
+}
+
+.game-description {
+  width: var(--text-optimal-width);
+  text-align: center;
+}
+
+.start-page-container input {
+  width: 20ch;
+  text-align: center;
+}
+
+.start-page-container button{
+  width:fit-content;
+  height: fit-content;
+}
+
+.section-about {
+  display: flex;
+}
+
+.contact-logos {
+  width: 4rem;
+
+}
+
+.myLogo {
+
+}
+
+.githubLogo {
+
+}
+
+/* #endregion */
+
+
+/* #region Pseudoelements */
+
+/* #endregion */
+
+
+/* #region Transitions */
+
+
+/* #endregion */
+
+
+/* #region Animations */
+
+  @keyframes rotate-element-animation {
+   0% {transform:perspective(300px) rotateY(0deg)}
+   25% {transform:perspective(300px) rotateY(90deg)}
+   50% {transform:perspective(300px) rotateY(180deg)}
+   75% {transform:perspective(300px) rotateY(270deg)}
+   100% {transform:perspective(300px) rotateY(360deg)}
+}
+
+/* #endregion */
+
+
+/* #region Media Queries */
+
+/* ? small devices */
+@media (max-width: 767.98px) {
+}
+
+/* #endregion */
+
