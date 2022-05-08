@@ -151,13 +151,14 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
 
     this.sizeX = sizeX; // ? X-axis length
     this.sizeY = sizeY; // ? Y-axis length
-    this.player = player; // ? Owner of the Gameboard object
+    this.player = player; // ? Owner of the Gameboard object if it is a human
+    if(typeof player === 'object'){player = player.name; position= player.position} // ? Destructure player object if human is false to get name and position of the cpu 
     shipIDCounter = 1; // ? Unique ship ID
     shipFormation = []; // ? Stores all ships
     formationCounter = 0;  // ? Gameboards should be able to report whether or not all of their ships have been sunk.
     this.missedAttacks = missedAttacks;
     missedAttacks = [];  // ? Gameboards should keep track of missed attacks so they can display them properly.
-    
+
     // ? Create gameboard container and append it to the game DOM-Section-Element
     const gameboard_container = document.createElement(`div`);
     gameboard_container.classList.add(`gameboards`);
@@ -178,6 +179,7 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
             const field = document.createElement(`div`); // ? Create the field DOM-Element with properties and append it to the row DOM-Element
             field.classList.add(`fields`);
             field.setAttribute(`data-fieldID`, fieldID);
+            field.classList.add(player+ fieldID);
             field.innerText = fieldID;
             row_container.appendChild(field);
         };
@@ -187,12 +189,12 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
 
     placement = (type, start, end) => {
 
-        // Argument validation
+        // ? Argument validation
         if(typeof type !== 'string') throw new TypeError('Only the strings "cruiser", "corvette", "battleship" or "aircraft-carrier" are allowed as ship type. Default is "cruiser".')
         if(Array.isArray(start) === false || Array.isArray(end) === false) throw new TypeError(`Only 'arrays' are allowed as start & end arguments.`);
         if(start.length + end.length !== 4) throw new Error('In each placement array 2 values are allowed: The x and the y coordinate values.');
 
-        //  Create new ship for placement
+        //  ? Create new ship for placement
         switch (type) {
             case 'cruiser':
                 newShip = Ship(1);
@@ -207,44 +209,60 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
                 newShip = Ship(4);
                 break;
         };
-        // Finalize ship 
+        // ? Finalize ship 
         newShip.ID = shipIDCounter;
         newShip.Owner = player;
         shipFormation.push(newShip);
         formationCounter++;
 
-        // Validate if placement correspond to ship length
-        if(start[0] === end[0]){ // Check direction of the placement: Ship length to Y-axis, like |
-            // f.e. if placement is: start 1/2 to end 1/3, get the y coordinates (2&3) & subtract it from each other. This have to be the exact value of the ship length minus 1. If this value is positive or negative depends if the coordinates are f.e. 1/2 to 1/3 or 1/2 to 1/1.  
+        // ? Validate if placement correspond to ship length
+        if(start[0] === end[0]){ // ? Check direction of the placement: Ship length to Y-axis, like --
+            // ? f.e. if placement is: start 1/2 to end 1/3, get the y coordinates (2&3) & subtract it from each other. This have to be the exact value of the ship length minus 1. 
+            // ? If this value is positive or negative depends if the coordinates are f.e. 1/2 to 1/3 or 1/2 to 1/1.  
             if(start[1] - end[1] !== -(newShip.length -1) && start[1] - end[1] !== (newShip.length -1)) throw new Error(`Placement coordinates do not correspond with ship length. For ${newShip.type} the coordinates only can differ ${newShip.length} fields.`)
         };
-        // Same as above but if the placement is in  the other direction.   
-        if(start[1] === end[1]){ // Check direction of the placement: Ship length to X-axis, like -- 
+        // ? Same as above but if the placement is in  the other direction.   
+        if(start[1] === end[1]){ // ? Check direction of the placement: Ship length to X-axis, like | 
             if(start[0] - end[0] !== -(newShip.length -1) && start[0] - end[0] !== (newShip.length -1)) throw new Error(`Placement coordinates do not correspond with ship length. For ${newShip.type} the coordinates only can differ ${newShip.length} fields.`)
         };
 
-         //  Make the placement in gameboard array
+         //  ? Make the placement in gameboard array
         correctPlacement = false; 
-        section = 1; 
-         if(start[0] === end[0]){ // Get the placement direction
-                for(y = start[1] - 1; y <= end[1] - 1; y++){ // Number of fields for placement
-                    row = gameboard[y]; // Get corect row in array
-                    row[start[0] - 1] = {ID: shipIDCounter, Type: type, Section: section}; // a[start[0]] is the actual field of the placement, set ship informations there
-                    section++; // Ship section is placed on the gameboard
+        section = 1;   
+         if(start[0] === end[0]){ // ? Get the placement direction, here like --
+                for(y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
+                    row = gameboard[start[0]]; // ? Get correct row (which is the same for all fields in a -- direction placement)
+                    fieldIDPlacement = row[y] ; // ? Get fieldID via row and the increasing column number between start[0] and end[0] 
+                   
+                    // ? With the field id place the ship in the corresponend DOM-Element 
+                    fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
+                    fieldAtDOM.innerText = `${type}${section}`;
+                   
+                    // ? Finalize ship placement in the gameboard array
+                    fieldIDPlacement = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
+                    section++; // ? Ship section is placed on the gameboard
                 };
-                correctPlacement = true; // If ship is correct placed on gameboard, placement is done
+                correctPlacement = true; // ? If ship is correct placed on gameboard, placement is done
         };         
-        if(start[1] === end[1]){ // Same as above but in the other axis
-            for(x = start[0] - 1; x <= end[0] - 1; x++){
-                row = gameboard[x]; 
-                row[start[0] - 1] = {ID: shipIDCounter, Type: type, Section: section}; 
-                section++; 
-            };
-            correctPlacement = true;
-        };       
-        shipIDCounter++; // Increase shipID counter so the next ship have a own ID
+        if(start[1] === end[1]){ // ? Get placement direction, here |
+            for(x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
+                row = gameboard[x];  // ? Get teh correct row in this loop round
+                fieldIDPlacement = row[start[1] - 1] ;  // ? Get fieldID via increasing row and the column, which stays the same for the whole | placement
 
-        // Inform invoker of placement
+                // ? With the field id place the ship in the corresponend DOM-Element 
+                fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
+                fieldAtDOM.innerText = `${type}${section}`;
+
+                // ? Finalize ship placement in the gameboard array
+                fieldIDPlacement = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
+                section++; // ? Ship section is placed on the gameboard
+            };
+            correctPlacement = true;  // ? If ship is correct placed on gameboard, placement is done
+        };       
+
+        shipIDCounter++; // ? Increase shipID counter so the next ship have a own ID
+
+        // ? Inform invoker of placement
         if  (correctPlacement === true) {
             // console.log(`Plaement of ${type} fullfilled: ${correctPlacement}.`); 
             return  `Placement of ${type} fullfilled: ${correctPlacement}. Coordinates: Start X${start[0]}/Y${start[1]}, End X${end[0]}/Y${end[1]}`;
@@ -317,14 +335,14 @@ const GameInformation = function (playerName){
 
     nextRound = () => {roundCounter++};
 
-    cpuName = () => {
+    cpuFullName = () => {
         switch (parseInt(localStorage.Level)) {
             case 1:
-                return `General Battlesmith`;
+                return {position: `General`, name: `Battlesmith`};
         };
     };
 
-    return { playerName, newPlayer, playerCounter, nextRound, roundCounter, cpuName };
+    return { playerName, newPlayer, playerCounter, nextRound, roundCounter, cpuFullName };
 };
 
 function openInNewTab(href) {
@@ -342,18 +360,17 @@ MainGameLoop = (playerName) => {
     document.body.appendChild(game_container);
   
     const info = new GameInformation(playerName); // ? Open new GameInformation object  
-    cpuName = info.cpuName(); // ? Get the name of the enemy cpu depending on the actual level 
+    cpuFullName = info.cpuFullName(); // ? Get the name of the enemy cpu depending on the actual level 
 
     //The game loop should set up a new game by creating Players and Gameboards. 
-    const player_Gameboard = new Gameboard(12, 10, playerName);  // For now just populate each Gameboard with predetermined coordinates. 
-    const cpu_Gameboard = new Gameboard(12, 10, cpuName);  // For now just populate each Gameboard with predetermined coordinates. 
+    const player_Gameboard = new Gameboard(10, 10, playerName);  // For now just populate each Gameboard with predetermined coordinates. 
+    const cpu_Gameboard = new Gameboard(10, 10, cpuFullName);  // For now just populate each Gameboard with predetermined coordinates. 
   
     const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
     const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
-    cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  // ? Placing a battleship on the gameboard in the 1 column from row 3 to 5
-    
-    player_Gameboard.placement("battleship", [3, 1], [5, 1]); 
+    player_Gameboard.placement("battleship", [3, 5], [3, 7]); // ? Placing a battleship on the gameboard in the 1 column from r ow 3 to 5
+    cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  
     
     TestPlayer.humanAttack(2, 1);
     FirstComputer.cpuAttack();
