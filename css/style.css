@@ -246,7 +246,6 @@ body {
 .game-container {
   height: 95vh;
   display: flex;
-  gap: 3rem;
   justify-content: center;
   align-items: center;
 }
@@ -254,18 +253,24 @@ body {
 .gameboards {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.gameboards:nth-child(2) {
+  margin-left: auto;
 }
 
 .rows {
   display: flex;
+  height: 100%;
 }
 
 .fields {
-  width: 2rem;
-  aspect-ratio: 1/1;
-  outline: solid 2px var(--text-main-colour);
+  /* width must be adjisted*/
+  width: 3rem;
+  outline: solid 1px var(--text-main-colour);
+  font-size: var(--fs-400);
   text-align: center;
-  vertical-align: middle;
 }
 
 .attacked {
