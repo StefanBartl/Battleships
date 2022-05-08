@@ -153,7 +153,7 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
     this.sizeY = sizeY; // ? Y-axis length
     this.player = player; // ? Owner of the Gameboard object if it is a human
     if(typeof player === 'object'){player = player.name; position= player.position} // ? Destructure player object if human is false to get name and position of the cpu 
-    shipIDCounter = 1; // ? Unique ship ID
+    shipIDCounter = 0; // ? Unique ship ID
     shipFormation = []; // ? Stores all ships
     formationCounter = 0;  // ? Gameboards should be able to report whether or not all of their ships have been sunk.
     this.missedAttacks = missedAttacks;
@@ -164,7 +164,7 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
     gameboard_container.classList.add(`gameboards`);
     document.querySelector(`.game-container`).appendChild(gameboard_container);
 
-    // ? Create new gameboard: 2 objects are created, the gameboard array to hold informations about ships, attackss etc... and the DOM-Elements to display it in the browser
+    // ! Create new gameboard: 2 objects are created, the gameboard array to hold informations about ships, attacks etc... and the DOM-Elements to display it in the browser
     let gameboard = [];
     let fieldID = 0;
     for(y = 1; y <= sizeY; y++){ // ? Row loop
@@ -239,7 +239,7 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
                     fieldAtDOM.innerText = `${type}${section}`;
                    
                     // ? Finalize ship placement in the gameboard array
-                    fieldIDPlacement = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
+                    row[y] = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                     section++; // ? Ship section is placed on the gameboard
                 };
                 correctPlacement = true; // ? If ship is correct placed on gameboard, placement is done
@@ -254,12 +254,11 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
                 fieldAtDOM.innerText = `${type}${section}`;
 
                 // ? Finalize ship placement in the gameboard array
-                fieldIDPlacement = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
+                row[start[1] - 1]  = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                 section++; // ? Ship section is placed on the gameboard
             };
             correctPlacement = true;  // ? If ship is correct placed on gameboard, placement is done
         };       
-
         shipIDCounter++; // ? Increase shipID counter so the next ship have a own ID
 
         // ? Inform invoker of placement
@@ -279,13 +278,40 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
         if(typeof x !== 'number' || typeof y !== 'number') throw new TypeError(`Only 'numbers' are allowed`);
         if(x > sizeX || y > sizeY || x < 0 || y < 0) throw new Error(`Only coordinates between 0 and the gameboard size are allowed. (${sizeX}/${sizeY}).`);
         
-        gameboard_row = gameboard[y-1]; // ? Get the attacked cell in the gameboard
-        if(typeof gameboard_row[x-1] !== 'number') { // ? If the attacked cell is not empty...
+        gameboard_row = gameboard[y-1]; // ? Get the gameboard row of the attacked cell
+        attackedFieldID = gameboard_row[x-1];
+        
+        // ? Calculate the fieldID via the attack coordinates
+        if(y === 1){
+            res = x;    // ? If the row is 0, the fieldID is exactly the x value (column)
+        };
+
+        if(y > 1){ // ? If row (y) is over 1.. (row 2 begins with 11) 
+            yVal = y-1; // ? The first digit of the result is y-1 (row 2 starts with 11, row 3 starts with 21...) 
+            if(x < 10){ // ? But the x value is under 10...
+                res = parseInt(`${yVal}${x}`);
+            };
+            if(x >= 10){ // ? If the x is over 9 we have to increase the y to...
+                xString = `${x}`; // ? Get the 2 digit via string
+                xVal = parseInt(xString[2]); // ? tranform it to number
+                yIncrease = parseInt(xString[1]); // ? Get the 1 digit via string
+                yVal +=yIncrease; // ? Increase y
+                res = parseInt(`${yVal}${xVal}`) // ? Get the result
+            };
+        };
+
+        attackedFieldAtDOM = document.querySelector(`.${player}${res}`); // ? Get the attacked field as DOM-Element
+
+        if(typeof attackedFieldID !== 'number') { // ? If the attacked cell is not empty. its a hit..
             gameboard_row[x -1].hitted = true; // ?  Set gameboard cell to hitted
-            formationPosition = gameboard_row[x - 1].ID - 1; // ? The ship ID is a unique increasing number, shipFormattion an array. If we want the ship with ID 1, we must do shipFormation[ID - 1]
+            formationPosition = gameboard_row[x - 1].ID - 1; // ? The ship ID is a unique increasing number, shipFormattion an array. If we want the ship with the the ID in the array, we must do shipFormation[ID - 1] 
             attackedShip = shipFormation[formationPosition]; // ? Get the attacked ship object in the shipFormation array
             attackedShip.hit(gameboard_row[x - 1].Section); // ? Hit the attacked ship
             
+            attackedFieldAtDOM.innerText = `x`;
+            attackedFieldAtDOM.setAttribute(`data-hitted`, true);
+            player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`hitted-cpu`, `hitted`) : attackedFieldID.classList.add(`hitted-human`, `hitted`);
+
             // Return from the function if a ship get hitted or maybe the whole formation is erased by the attack
             for(let x of shipFormation){
                 if(x.sunkenState() === true){ // ? Return if all ships in formation are sunken
@@ -302,6 +328,11 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
                 return  { string: 'Attack hitted a ship', ship: attackedShip }
             } else {
                 missedAttacks.push(gameboard_row[x - 1]);  // ? If the attack didn't hit a ship, return this and keep track of missed attacks
+
+                attackedFieldAtDOM.innerText = `o`;
+                attackedFieldAtDOM.setAttribute(`data-attacked`, true);
+                player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`attacked-cpu`, `attacked`) : attackedFieldID.classList.add(`attacked-human`, `attacked`);
+
                 console.log(`Attack didn't hitted a ship`);
                 return false;
             };
@@ -372,8 +403,9 @@ MainGameLoop = (playerName) => {
     player_Gameboard.placement("battleship", [3, 5], [3, 7]); // ? Placing a battleship on the gameboard in the 1 column from r ow 3 to 5
     cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  
     
-    TestPlayer.humanAttack(2, 1);
+    TestPlayer.humanAttack(1, 3);
     FirstComputer.cpuAttack();
+    TestPlayer.humanAttack(3, 1);
 
     // ! You can implement a system for allowing players to place their ships later.
 // cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
