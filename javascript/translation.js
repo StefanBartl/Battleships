@@ -31,10 +31,11 @@ languageTranslate.addEventListener("click", ()=>{
 function English() {
   // Start Page
   languageTranslate.innerText = `de.`;
+  languageTranslate.title = `Change language to German`;
   page_headline.innerText = `Battleship Online`;
   game_description.innerText = `Welcome to 'Battleship Online'. 
   Choose your name and click the Start button to start the game. 
-  You start at level 1`;
+  Your level: ${localStorage.Level || 1}`;
   player_name.title = `Choose your name`;
   startGame_btn.innerText = `Start Game`;
   startGame_btn.title = `Click here to start the game`;
@@ -45,10 +46,11 @@ function English() {
 function German() {
   // Start page
   languageTranslate.innerText = `en.`;
+  languageTranslate.title = `Wechsle die Sprache zu Englisch`;
   page_headline.innerText = `Battleship Online`;
   game_description.innerText = `Willkommen bei 'Battleship Online'. 
   Wähle deinen Namen und klicke auf den Start Button um das Spiel zu starten. 
-  Du startest bei Level 1`;
+  Dein Level:  ${localStorage.Level || 1}`;
   player_name.title = `Wähle deinen Namen`;
   startGame_btn.innerText = `Spiel starten`;
   startGame_btn.title = `Klicke um das Spiel zu starten`;

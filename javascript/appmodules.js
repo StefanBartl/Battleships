@@ -158,18 +158,32 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
     this.missedAttacks = missedAttacks;
     missedAttacks = [];  // ? Gameboards should keep track of missed attacks so they can display them properly.
     
+    // ? Create gameboard container and append it to the game DOM-Section-Element
+    const gameboard_container = document.createElement(`div`);
+    gameboard_container.classList.add(`gameboards`);
+    document.querySelector(`.game-container`).appendChild(gameboard_container);
 
-    // Create a new Gameboard
+    // ? Create new gameboard: 2 objects are created, the gameboard array to hold informations about ships, attackss etc... and the DOM-Elements to display it in the browser
     let gameboard = [];
     let fieldID = 0;
-    for(y = 1; y <= sizeY; y++){
-        let row = [];
-        for(x = 1; x <= sizeX; x++){
-            fieldID++;
-            row.push(fieldID);
+    for(y = 1; y <= sizeY; y++){ // ? Row loop
+        let row = []; // ? Create row array for the gameboard array
+        const row_container = document.createElement(`div`);  // ? Create the row DOM-Element with properties & append it to players gameboard DOM container
+        row_container.classList.add(`rows`);
+        row_container.setAttribute(`data-rowNumber`, y);
+        gameboard_container.appendChild(row_container);
+        for(x = 1; x <= sizeX; x++){ // ? Fields loop
+            fieldID++; // ? Increase the field ID
+            row.push(fieldID); // ? Push the field to the row array in the gameboard array
+            const field = document.createElement(`div`); // ? Create the field DOM-Element with properties and append it to the row DOM-Element
+            field.classList.add(`fields`);
+            field.setAttribute(`data-fieldID`, fieldID);
+            field.innerText = fieldID;
+            row_container.appendChild(field);
         };
-        gameboard.push(row);
+        gameboard.push(row); // ? Push the row array within the fieldIDs to the gameboard array 
     };
+
 
     placement = (type, start, end) => {
 
@@ -289,48 +303,28 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
     return { sizeX, sizeY, gameboard, placement, player, receiveAttack, missedAttacks,  missedAttacksArray, shipFormation, formationCounter, alive,  };
 };
 
-const GameInformation = function (level){
-
-    this.level = level;
+const GameInformation = function (playerName){
+    // ? Declaration
+    this.playerName = playerName;
     playerCounter = 0;
     roundCounter = 0;
 
-    newPlayer = () => {playerCounter++}
+    if(localStorage.Level === undefined) {localStorage.Level = `1`;} // ? Check & set actual level
+
+    newPlayer = () => { // ? Sign a new player
+        playerCounter++; // ? Increase player counter
+    };
+
     nextRound = () => {roundCounter++};
 
-    cpuName = (level) => {
-        switch (level) {
+    cpuName = () => {
+        switch (parseInt(localStorage.Level)) {
             case 1:
                 return `General Battlesmith`;
         };
     };
 
-    return { level, newPlayer, playerCounter, nextRound, roundCounter, cpuName };
-};
-
-MainGameLoop = (playerName) => {
-    if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
-    localStorage.Level === undefined ?  level = 1 : level = localStorage.Level; // ? Check & set level
-  
-    const info = new GameInformation(level);
-    cpuName = info.cpuName();
-
-    //The game loop should set up a new game by creating Players and Gameboards. 
-    // For now just populate each Gameboard with predetermined coordinates. You can implement a system for allowing players to place their ships later.
-    const player_Gameboard = new Gameboard(10,6, playerName);
-    const cpu_Gameboard = new Gameboard(10,6, cpuName); 
-
-    // cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
-    // player_Gameboard.enemyGameboardAdd(cpu_Gameboard);
-    
-    const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create Player
-    cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  // ? Placing a battleship on the gameboard in the 1 column from row 3 to 5
-    
-    const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); 
-    player_Gameboard.placement("battleship", [3, 1], [5, 1]); 
-    
-    TestPlayer.humanAttack(2, 1);
-    FirstComputer.cpuAttack();
+    return { playerName, newPlayer, playerCounter, nextRound, roundCounter, cpuName };
 };
 
 function openInNewTab(href) {
@@ -338,4 +332,33 @@ function openInNewTab(href) {
       target: '_blank',
       href: href,
     }).click();
+};
+
+MainGameLoop = (playerName) => {
+    if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
+
+    const game_container = document.createElement(`section`);
+    game_container.classList.add(`game-container`);
+    document.body.appendChild(game_container);
+  
+    const info = new GameInformation(playerName); // ? Open new GameInformation object  
+    cpuName = info.cpuName(); // ? Get the name of the enemy cpu depending on the actual level 
+
+    //The game loop should set up a new game by creating Players and Gameboards. 
+    const player_Gameboard = new Gameboard(12, 10, playerName);  // For now just populate each Gameboard with predetermined coordinates. 
+    const cpu_Gameboard = new Gameboard(12, 10, cpuName);  // For now just populate each Gameboard with predetermined coordinates. 
+  
+    const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
+    const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
+
+    cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  // ? Placing a battleship on the gameboard in the 1 column from row 3 to 5
+    
+    player_Gameboard.placement("battleship", [3, 1], [5, 1]); 
+    
+    TestPlayer.humanAttack(2, 1);
+    FirstComputer.cpuAttack();
+
+    // ! You can implement a system for allowing players to place their ships later.
+// cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
+// player_Gameboard.enemyGameboardAdd(cpu_Gameboard);
 };

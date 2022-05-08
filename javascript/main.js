@@ -26,7 +26,6 @@ todo
 startGame_btn.addEventListener(`click`, () => {
   // ? Name Validation and storing
   let PlayerName = document.querySelector(`.choose-name-input`).value;
-  console.log(PlayerName);
   if(PlayerName.length < 3){
     alert(
     localStorage.language === "en" 
@@ -45,7 +44,7 @@ myLogo.addEventListener(`click`, () => {
   openInNewTab(`https://stefanbartl.github.io/Portfolio/`);
 });
 
-githubLogo.addEventListener(`click`, () => {
+githubLogo.addEventListener(`click`, () => { 
   openInNewTab(`https://github.com/StefanBartl/Battleships`);
 });
 
