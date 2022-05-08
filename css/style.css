@@ -213,20 +213,20 @@ body {
 
 .section-about {
   display: flex;
+  gap: 1rem;
 }
 
 .contact-logos {
   width: 4rem;
-
 }
 
-.myLogo {
+/* .myLogo {
 
 }
 
 .githubLogo {
 
-}
+} */
 
 /* #endregion */
 

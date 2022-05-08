@@ -21,11 +21,6 @@ todo
 //#endregion
 
 
-//#region User interface
-
-//#endregion
-
-
 //#region Start-Page Event-Listener
 
 startGame_btn.addEventListener(`click`, () => {
@@ -42,15 +37,16 @@ startGame_btn.addEventListener(`click`, () => {
   };
   localStorage.PlayerName = PlayerName;
   
-  MainGameLoop();
+  MainGameLoop(PlayerName);
+  startPage_container.remove();
 });
 
 myLogo.addEventListener(`click`, () => {
-  OpenInNewTab(`https://stefanbartl.github.io/Portfolio/`);
+  openInNewTab(`https://stefanbartl.github.io/Portfolio/`);
 });
 
 githubLogo.addEventListener(`click`, () => {
-  OpenInNewTab(`https://github.com/StefanBartl/Battleships`);
+  openInNewTab(`https://github.com/StefanBartl/Battleships`);
 });
 
 

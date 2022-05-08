@@ -1,0 +1,19 @@
+{
+  "name": "battleships",
+  "version": "1.0.0",
+  "description": "Battleship without webpack version",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StefanBartl/Battleships.git"
+  },
+  "author": "Stefan Bartl",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StefanBartl/Battleships/issues"
+  },
+  "homepage": "https://github.com/StefanBartl/Battleships#readme"
+}

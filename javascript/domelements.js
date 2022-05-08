@@ -20,8 +20,8 @@ player_name.type = `text`;
 player_name.minLength = 3;
 player_name.maxLength = 15;
 if(localStorage.PlayerName !== undefined) player_name.value = localStorage.PlayerName;
-myLogo.src  = `/graphics/icons/dev_logo.png`;
-githubLogo.src =  `/graphics/icons/github/github-original-wordmark.svg`;
+myLogo.src  = `./graphics/icons/dev_logo.png`;
+githubLogo.src =  `./graphics/icons/github/github-original-wordmark.svg`;
 
 // Add classes
 page_headline.classList.add(`page-headline`);
