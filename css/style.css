@@ -301,6 +301,13 @@ body {
   cursor: pointer;
 }
 
+.attacked,
+.hitted,
+.sunken-ship {
+  pointer-events: none;
+  cursor: none;
+}
+
 /* #region Pseudoelements */
 
 /* #endregion */

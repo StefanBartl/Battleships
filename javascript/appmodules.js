@@ -1,4 +1,3 @@
-
 const Ship = function (length) {
     // Ships will be objects that include their length, where they’ve been hit and whether or not they’ve been sunk
     
@@ -146,16 +145,26 @@ const Ship = function (length) {
 
 };
 
-const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipFormation){
+const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCounter, shipFormation, formationCounter){
+
+    // ? Argument validation
+    // if(typeof sizeX !== 'number' || typeof sizeY !== 'number') throw new TypeError(`Gameboard size arguments must be 'numbers'`);
+    // if(typeof player === undefined || typeof player === null) throw new TypeError(`Human players needs a 'string' argumnent, CPU-Players a Object with keys player & position.`)
+    // if(typeof info !== 'object') throw new TypeError(`The info argument must be GameInformation Object.`);
+    // if(typeof missedAttacks !== undefined || typeof shipIDCounter !== undefined || typeof shipFormation !== undefined || typeof formationCounter !== undefined) throw new TypeError(`Passing arguments for this parameter is not allowed`);
+
     this.sizeX = sizeX; // ? X-axis length
     this.sizeY = sizeY; // ? Y-axis length
     this.player = player; // ? Owner of the Gameboard object if it is a human
-    this.info = info;
+    this.info = info; // ? Info object of the current game
+    this.missedAttacks = missedAttacks; // ? Object for the missed attacks 
+    this.shipIDCounter = shipIDCounter; // ? Object to count the ID up to get unique ships IDs
+    this.formationCounter = formationCounter; // ?`Object to count the number of ships in the formation of the player
+
     if(typeof player === 'object'){player = player.name; position= player.position} // ? Destructure player object if human is false to get name and position of the cpu 
     shipIDCounter = 0; // ? Unique ship ID
     shipFormation = []; // ? Stores all ships
     formationCounter = 0;  // ? Gameboards should be able to report whether or not all of their ships have been sunk.
-    this.missedAttacks = missedAttacks;
     missedAttacks = [];  // ? Gameboards should keep track of missed attacks so they can display them properly.
 
     // ? Create gameboard container and append it to the game DOM-Section-Element
@@ -314,7 +323,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
         // ! Proof if the attack hitted a ship or not
         if(typeof attackedFieldID !== 'number') { // ? If the attacked cell is not empty. its a hit..
             gameboard_row[x -1].hitted = true; // ?  Set gameboard cell to hitted
-            formationPosition = gameboard_row[x - 1].ID - 1; // ? The ship ID is a unique increasing number, shipFormattion an array. If we want the ship with the the ID in the array, we must do shipFormation[ID - 1] 
+            formationPosition = gameboard_row[x - 1].ID; // ? The ship ID is a unique increasing number, shipFormattion an array. If we want the ship with the the ID in the array, we must do shipFormation[ID - 1] 
             attackedShip = shipFormation[formationPosition]; // ? Get the attacked ship object in the shipFormation array
 
             attackedShipAtDOMArray = document.getElementsByClassName (`${player}${gameboard_row[x - 1].ID}`); // ? Get the attacked ship as DOM-Elements
@@ -326,13 +335,17 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
             player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`hitted-cpu`, `hitted`) : attackedFieldID.classList.add(`hitted-human`, `hitted`); // ? Depending on the name knowing if human or cpu add hitted classes
 
             // ! Return from the function if  the whole formation is erased by the attack and inform player
-            for(let x of shipFormation){
-                if(x.sunkenState() === true){ // ? Return if all ships in formation are sunken
+            for(let x = 0; x < shipFormation.length; x++){
+                if(shipFormation[x].sunkenState() === true){ // ? Return if all ships in formation are sunken
                     formationCounter--;
                     if(formationCounter === 0){
-                        alive = false; 
-                        
                         alert(`Enemy formation is destroyed`);
+                        alive = false; // ! Needed ???
+
+                        for(x of attackedShipAtDOMArray){
+                            x.classList.add(`sunken-ship`); // ! Maybe an animation ???
+                        };
+                        // ! Here we must go to next level, congratulations, and so on... In the MainGameLoop we must proof of return to get know this
                         console.log(`Attack hitted & destroyed last ship!`);
                         return `Attack hitted & destroyed last shipt!`;
                     };

@@ -16,7 +16,16 @@ todo                 Javascript - what a wonderful language!
 
 //#region Open Jobs  
 /*
-todo
+todo Random cpu ship placement
+todo display images for human placements. Idea: for 3 fields ship cut a image in 3 pieces and than place it.
+todo display the names
+todo next level
+todo storyline
+todo get informations by attacked and sunken ships by hovering 
+todo correct height and width of the gameboards
+todo Animations for attacking, hitted or sunken ships 
+todo dont allow placement as long as the cpu didnt placed (or make the cpu placement instantly....)
+todo LAST THING: Dont display the enemy gameboard :-) 
 */
 //#endregion
 
