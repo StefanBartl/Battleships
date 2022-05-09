@@ -283,6 +283,14 @@ body {
   background-color: var(--wkd-red);
 }
 
+.sunken-ship {
+  background-color: white;
+  background-image: url(../graphics/images/free-svg/pinkskull.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
 /* #endregion */
 
 .language-translate, /* ? All elements which get a cursor:pointer  */

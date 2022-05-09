@@ -147,11 +147,10 @@ const Ship = function (length) {
 };
 
 const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipFormation){
-
     this.sizeX = sizeX; // ? X-axis length
     this.sizeY = sizeY; // ? Y-axis length
     this.player = player; // ? Owner of the Gameboard object if it is a human
-    this.inf0 = info;
+    this.info = info;
     if(typeof player === 'object'){player = player.name; position= player.position} // ? Destructure player object if human is false to get name and position of the cpu 
     shipIDCounter = 0; // ? Unique ship ID
     shipFormation = []; // ? Stores all ships
@@ -221,7 +220,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
         };
         // ? Finalize ship 
         newShip.ID = shipIDCounter;
-        newShip.Owner = player;
+        newShip.Owner = this.player;
         shipFormation.push(newShip);
         formationCounter++;
 
@@ -247,7 +246,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
                     // ? With the field id place the ship in the corresponend DOM-Element 
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
-                   
+                    fieldAtDOM.classList.add(`${player}${newShip.ID}`)
                     // ? Finalize ship placement in the gameboard array
                     row[y] = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                     section++; // ? Ship section is placed on the gameboard
@@ -262,6 +261,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
                 // ? With the field id place the ship in the corresponend DOM-Element 
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                 fieldAtDOM.innerText = `${type}${section}`;
+                fieldAtDOM.classList.add(`${player}${newShip.ID}`)
 
                 // ? Finalize ship placement in the gameboard array
                 row[start[1] - 1]  = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
@@ -291,7 +291,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
         gameboard_row = gameboard[y-1]; // ? Get the gameboard row of the attacked cell
         attackedFieldID = gameboard_row[x-1];
         
-        // ? Calculate the fieldID via the attack coordinates
+        // ! Calculate the fieldID and the DOM-Element via the attack coordinates
         if(y === 1){
             res = x;    // ? If the row is 0, the fieldID is exactly the x value (column)
         };
@@ -309,30 +309,47 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipForma
                 res = parseInt(`${yVal}${xVal}`) // ? Get the result
             };
         };
-
         attackedFieldAtDOM = document.querySelector(`.${player}${res}`); // ? Get the attacked field as DOM-Element
 
+        // ! Proof if the attack hitted a ship or not
         if(typeof attackedFieldID !== 'number') { // ? If the attacked cell is not empty. its a hit..
             gameboard_row[x -1].hitted = true; // ?  Set gameboard cell to hitted
             formationPosition = gameboard_row[x - 1].ID - 1; // ? The ship ID is a unique increasing number, shipFormattion an array. If we want the ship with the the ID in the array, we must do shipFormation[ID - 1] 
             attackedShip = shipFormation[formationPosition]; // ? Get the attacked ship object in the shipFormation array
+
+            attackedShipAtDOMArray = document.getElementsByClassName (`${player}${gameboard_row[x - 1].ID}`); // ? Get the attacked ship as DOM-Elements
             attackedShip.hit(gameboard_row[x - 1].Section); // ? Hit the attacked ship
-            
+
+            // ? Hitted DOM-Element
             attackedFieldAtDOM.innerText = `x`;
             attackedFieldAtDOM.setAttribute(`data-hitted`, true);
-            player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`hitted-cpu`, `hitted`) : attackedFieldID.classList.add(`hitted-human`, `hitted`);
+            player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`hitted-cpu`, `hitted`) : attackedFieldID.classList.add(`hitted-human`, `hitted`); // ? Depending on the name knowing if human or cpu add hitted classes
 
-            // Return from the function if a ship get hitted or maybe the whole formation is erased by the attack
+            // ! Return from the function if  the whole formation is erased by the attack and inform player
             for(let x of shipFormation){
                 if(x.sunkenState() === true){ // ? Return if all ships in formation are sunken
                     formationCounter--;
                     if(formationCounter === 0){
                         alive = false; 
+                        
+                        alert(`Enemy formation is destroyed`);
                         console.log(`Attack hitted & destroyed last ship!`);
                         return `Attack hitted & destroyed last shipt!`;
                     };
                 };
             };
+            if(attackedShip.sunkenState() === true){
+
+                for(x of attackedShipAtDOMArray){
+                    x.classList.add(`sunken-ship`); // ! Maybe an animation ???
+                };
+
+                alert(`Ship destroyed`);
+                console.log(`Ship destroyed`);
+                return  { string: 'Ship destroyed', ship: attackedShip }
+            };
+
+                // ! Return from the function if a ship get hitted  by the attack and inform player
                 console.log(`Attack hitted a ship`);  // ? If the attack hitted a ship, return this
                 return  { string: 'Attack hitted a ship', ship: attackedShip }
             } else {
