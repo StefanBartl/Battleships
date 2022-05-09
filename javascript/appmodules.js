@@ -179,8 +179,18 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
             const field = document.createElement(`div`); // ? Create the field DOM-Element with properties and append it to the row DOM-Element
             field.classList.add(`fields`);
             field.setAttribute(`data-fieldID`, fieldID);
+            field.setAttribute(`data-fieldY`, y);
+            field.setAttribute(`data-fieldX`, x);
             field.classList.add(player+ fieldID);
             field.innerText = fieldID;
+
+            field.addEventListener('click', () => {
+                y = parseInt(field.getAttribute(`data-fieldY`));
+                x = parseInt(field.getAttribute(`data-fieldX`));
+                receiveAttack(y, x);
+
+            });
+
             row_container.appendChild(field);
         };
         gameboard.push(row); // ? Push the row array within the fieldIDs to the gameboard array 
@@ -357,6 +367,7 @@ const GameInformation = function (playerName){
     this.playerName = playerName;
     playerCounter = 0;
     roundCounter = 0;
+    onTurn = `player`;
 
     if(localStorage.Level === undefined) {localStorage.Level = `1`;} // ? Check & set actual level
 
@@ -364,7 +375,10 @@ const GameInformation = function (playerName){
         playerCounter++; // ? Increase player counter
     };
 
-    nextRound = () => {roundCounter++};
+    nextRound = () => {
+        roundCounter++; // ? Increase the round counter
+        onTurn === `player` ? onTurn = `cpu` : `player`; // ? Change who is on turn
+    };
 
     cpuFullName = () => {
         switch (parseInt(localStorage.Level)) {
@@ -403,6 +417,8 @@ MainGameLoop = (playerName) => {
     player_Gameboard.placement("battleship", [3, 5], [3, 7]); // ? Placing a battleship on the gameboard in the 1 column from r ow 3 to 5
     cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  
     
+    // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
+
     TestPlayer.humanAttack(1, 3);
     FirstComputer.cpuAttack();
     TestPlayer.humanAttack(3, 1);

@@ -178,7 +178,7 @@ body {
 
 /* #region Start-Page */
 
-.start-page-container {
+.start-page-container { /* ? Container where the elements of the starting page are placed in */
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -187,54 +187,47 @@ body {
   gap: 10%;
 }
 
-.language-translate {
+.language-translate { /* ? Language translation element */
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
 }
 
-.page-headline {
+.page-headline { /* ? h1-element with the headline of the page */
   text-align: center;
   font-size: 4rem;
 }
 
-.game-description {
+.game-description { /* ? p-element with the description text */
   width: var(--text-optimal-width);
   text-align: center;
 }
 
-.start-page-container input {
+.start-page-container input { /* ? input 'text'-element for human players name */
   width: 20ch;
   text-align: center;
 }
 
-.start-page-container button{
+.start-page-container button{ /* ? button-element to start the game */
   width:fit-content;
   height: fit-content;
 }
 
-.section-about {
+.section-about { /* ? section-element which the logos are placed in */
   display: flex;
   gap: 2rem;
 }
 
-.contact-logos {
+.contact-logos { /* ? Both logos */
   width: 4rem;
 }
 
-.language-translate,
-.start-page-container input,
-.start-page-container button,
-.contact-logos {
-  cursor: pointer;
-}
-
-/* .myLogo {
+/* .myLogo { 
 
 }
 */
 
-.githubLogo {
+.githubLogo { /* ? Github-Logo */
   filter: invert(1);
 } 
 
@@ -243,48 +236,62 @@ body {
 
 /* #region Game */
 
-.game-container {
+.game-container { /* ? Container where the two gameboards are placed */
   height: 95vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.gameboards {
+.gameboards { /* ? Both gameboards */
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin-bottom: .5rem;
 }
 
-.gameboards:nth-child(2) {
+.gameboards:nth-child(1) { /* ? Left gameboard (Human) */
+  margin-left: .5rem;
+  pointer-events: none;
+}
+
+.gameboards:nth-child(2) { /* ? Right gameboard (CPU) */
   margin-left: auto;
+  margin-right: .5rem;
 }
 
-.rows {
+.rows { /* ? Gameboard rows */
   display: flex;
   height: 100%;
 }
 
-.fields {
-  /* width must be adjisted*/
+.fields { /* ? Gameboard fields */
+  /* ! width must be adjusted*/
   width: 3rem;
   outline: solid 1px var(--text-main-colour);
   font-size: var(--fs-400);
   text-align: center;
 }
 
-.attacked {
+.attacked { /* ? Fields which are attacked and didn't hitted a ship */
   color: var(--wkd-orange);
   background-color: var(--wkd-orange);
 }
 
-.hitted {
+.hitted { /* ? Fields which are attacked and hitted a ship */
   color: var(--wkd-red);
   background-color: var(--wkd-red);
 }
 
 /* #endregion */
 
+.language-translate, /* ? All elements which get a cursor:pointer  */
+.start-page-container input,
+.start-page-container button,
+.contact-logos,
+.gameboards:nth-child(2) {
+  cursor: pointer;
+}
 
 /* #region Pseudoelements */
 
