@@ -74,7 +74,7 @@ const Ship = function (length) {
      return { length, type, health, damage, sectionsState, sunkenState, hit};
  };
 
-  const Player = function (name, human, ownGameboard, enemyGameboard, info){
+const Player = function (name, human, ownGameboard, enemyGameboard, info){
 
     this.name = name;
     this.ownGameboard = ownGameboard;
@@ -85,8 +85,8 @@ const Ship = function (length) {
     if(typeof name !== 'string') throw new TypeError (`The name parameter must be a string.`);
     if(typeof info !== 'object' && info.constructor !== Object)
         {throw new TypeError('The game parameter must be a "object".')}
-         else { // ? Check if there are players open to play
-             if(info.playerCounter < 3) {info.newPlayer();}// ? Sign new player up if possible
+            else { // ? Check if there are players open to play
+                if(info.playerCounter < 3) {info.newPlayer();}// ? Sign new player up if possible
                 else throw new Error("No more players allowed.") // ? Or reject
             };  
 
@@ -130,7 +130,7 @@ const Ship = function (length) {
         validCoordinates = getRandomAttackCo(); // ? Invoke getRandomAttackCo() to either get coordinates or false
         if(validCoordinates === false || validCoordinates ===  undefined){
             getRandomAttackCo(); } // ? If no valid coordinates are returned, invoke it again
-             return validCoordinates; // ? If coordinates are received, return it        
+                return validCoordinates; // ? If coordinates are received, return it        
     };
 
     // ! The AI does not have to be smart, but it should know whether or not a given move is legal. (i.e. it shouldn’t shoot the same coordinate twice).
@@ -223,7 +223,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             case 'Submarine':
                 newShip = Ship(3);
                 break;
-            case 'Destroyer':
+            case 'Cruiser':
                 newShip = Ship(3);
                 break;
             case 'Batlleship':
@@ -255,7 +255,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         section = 1;   
          if(start[0] === end[0]){ // ? Get the placement direction, here like --
                 for(y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
-                    row = gameboard[start[0]]; // ? Get correct row (which is the same for all fields in a -- direction placement)
+                    row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
                     fieldIDPlacement = row[y] ; // ? Get fieldID via row and the increasing column number between start[0] and end[0] 
                    
                     // ? With the field id place the ship in the corresponend DOM-Element 
@@ -270,7 +270,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         };         
         if(start[1] === end[1]){ // ? Get placement direction, here |
             for(x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
-                row = gameboard[x];  // ? Get teh correct row in this loop round
+                row = gameboard[x];  // ? Get the correct row in this loop round
                 fieldIDPlacement = row[start[1] - 1] ;  // ? Get fieldID via increasing row and the column, which stays the same for the whole | placement
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
@@ -440,6 +440,60 @@ openInNewTab = (href) => {
     }).click();
 };
 
+getShipLength = (shipType) =>{
+if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
+if(shipType === `Destroyer`) return 2;
+if(shipType === `Submarine`) return 3;
+if(shipType === `Cruiser`) return 3;
+if(shipType === `Battleship`) return 4;
+if(shipType === `Carrier`) return 5;
+throw new Error(`Argument shipType must be Destroyer, Submarine, Cruiser, Battleship or Carrier 'string'`);
+};
+
+getRandomDirection = () => {
+    // ? Randomize in which direction ship is placed. (  horizontal -- or vertical  |  )
+    // randomDirection = getRandomInt(2);
+    if(getRandomInt(2) === 0){
+         return `horizontal`       // ?   --
+    } else return `vertical`;    // ? |
+};
+
+getRandomXCPUValues = (sizeX) => {
+    xValue = getRandomInt(sizeX + 1);
+    if(xValue === 0 || typeof xValue !== 'number') {
+        getRandomXCPUValues();
+        return;
+    };
+    return xValue;
+};
+
+getRandomYCPUValues = (sizeY) => {
+    yValue = getRandomInt(sizeY + 1);
+    if(yValue === 0 || typeof yValue !== 'number') {
+        getRandomYCPUValues();
+        return;
+    };
+    return yValue;
+};
+
+randomShipPlacementValues = (shipType) => {
+    if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
+    shipLength = getShipLength(shipType);
+
+    // ? Random Destroyer placement
+    direction =  getRandomDirection();
+    if (direction === `horizontal`){ // ? --
+    xValue =  getRandomXCPUValues(cpu_Gameboard.sizeX - shipLength);
+        yValue = getRandomYCPUValues(cpu_Gameboard.sizeY);
+        return {start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]};
+    };
+    if (direction === `vertical`){ // ? |
+        xValue =  getRandomXCPUValues(cpu_Gameboard.sizeX);
+        yValue = getRandomYCPUValues(cpu_Gameboard.sizeY - shipLength - 1);
+        return {start: [yValue, xValue], end: [yValue + shipLength - 1, xValue]};
+    };
+};
+
 MainGameLoop = (playerName) => {
     if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
 
@@ -458,7 +512,17 @@ MainGameLoop = (playerName) => {
     const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
     player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
-    cpu_Gameboard.placement("Submarine", [1, 1], [3, 1]);  
+ 
+
+    randomCPUPlacement = () => {
+
+        destroyerCoordinates = randomShipPlacementValues(`Submarine`);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+        cpu_Gameboard.placement("Submarine", [destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);  
+
+    };
+    // ! Validation for occupied fields
+    randomCPUPlacement();
+
     
     // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
 

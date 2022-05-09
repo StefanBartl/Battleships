@@ -16,7 +16,7 @@ todo                 Javascript - what a wonderful language!
 
 //#region Open Jobs  
 /*
-todo Random cpu ship placement
+todo Validation for occupied fields
 todo HUman placement
 todo display images for human placements. Idea: for 3 fields ship cut a image in 3 pieces and than place it.
 todo display the names
