@@ -1,3 +1,4 @@
+
 const Ship = function (length) {
     // Ships will be objects that include their length, where they’ve been hit and whether or not they’ve been sunk
     
@@ -71,19 +72,19 @@ const Ship = function (length) {
      return { length, type, health, damage, sectionsState, sunkenState, hit};
  };
 
-  const Player = function (name, human, ownGameboard, enemyGameboard, game){
+  const Player = function (name, human, ownGameboard, enemyGameboard, info){
 
     this.name = name;
     this.ownGameboard = ownGameboard;
     this.enemyGameboard = enemyGameboard;
-    this.game = game;
+    this.info = info;
 
     // Argument validation
     if(typeof name !== 'string') throw new TypeError (`The name parameter must be a string.`);
-    if(typeof game !== 'object' && game.constructor !== Object)
+    if(typeof info !== 'object' && info.constructor !== Object)
         {throw new TypeError('The game parameter must be a "object".')}
          else { // ? Check if there are players open to play
-             if(game.playerCounter < 3) {game.newPlayer();}// ? Sign new player up if possible
+             if(info.playerCounter < 3) {info.newPlayer();}// ? Sign new player up if possible
                 else throw new Error("No more players allowed.") // ? Or reject
             };  
 
@@ -98,7 +99,6 @@ const Ship = function (length) {
                 fieldNumber = row[x - 1];
                 if(enemyGameboard.missedAttacks.indexOf(fieldNumber) !== -1) throw new Error(`This field was attacked before`); // ? Check if the field was attacked before by checking the field number in the enemy missedAttacks array
                 result = enemyGameboard.receiveAttack(y, x); // ? Attack the enemy gameboard
-                game.nextRound(); // ? Increase the round counter
                 return result 
             } else throw new Error(`Computer Player must use cpuAttack()`);
         };
@@ -136,7 +136,6 @@ const Ship = function (length) {
         if(human === false){ // ? Only allow computer  player
             randomCoordinates = getValidRandomAttackCo(); // ? Get valid coordinates
             result = enemyGameboard.receiveAttack(randomCoordinates[0] + 1, randomCoordinates[1] + 1); // ? Attack the enemy gameboard
-            game.nextRound(); // ? Increase round counter
             return result
         } else throw new Error(`Humans must use humanAttack()`);
     };
@@ -147,11 +146,12 @@ const Ship = function (length) {
 
 };
 
-const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
+const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipFormation){
 
     this.sizeX = sizeX; // ? X-axis length
     this.sizeY = sizeY; // ? Y-axis length
     this.player = player; // ? Owner of the Gameboard object if it is a human
+    this.inf0 = info;
     if(typeof player === 'object'){player = player.name; position= player.position} // ? Destructure player object if human is false to get name and position of the cpu 
     shipIDCounter = 0; // ? Unique ship ID
     shipFormation = []; // ? Stores all ships
@@ -188,7 +188,7 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
                 y = parseInt(field.getAttribute(`data-fieldY`));
                 x = parseInt(field.getAttribute(`data-fieldX`));
                 receiveAttack(y, x);
-
+                info.nextRound(); // ? Trigger next round from a human attack
             });
 
             row_container.appendChild(field);
@@ -333,7 +333,6 @@ const Gameboard = function (sizeX, sizeY, player, missedAttacks, shipFormation){
                     };
                 };
             };
-
                 console.log(`Attack hitted a ship`);  // ? If the attack hitted a ship, return this
                 return  { string: 'Attack hitted a ship', ship: attackedShip }
             } else {
@@ -371,13 +370,17 @@ const GameInformation = function (playerName){
 
     if(localStorage.Level === undefined) {localStorage.Level = `1`;} // ? Check & set actual level
 
+    actualOnTurn = () => {
+        return onTurn;
+    };
+
     newPlayer = () => { // ? Sign a new player
         playerCounter++; // ? Increase player counter
     };
 
     nextRound = () => {
         roundCounter++; // ? Increase the round counter
-        onTurn === `player` ? onTurn = `cpu` : `player`; // ? Change who is on turn
+        onTurn === `player` ? onTurn = `cpu` : onTurn =  `player`; // ? Change who is on turn
     };
 
     cpuFullName = () => {
@@ -387,7 +390,7 @@ const GameInformation = function (playerName){
         };
     };
 
-    return { playerName, newPlayer, playerCounter, nextRound, roundCounter, cpuFullName };
+    return { playerName, actualOnTurn, newPlayer, playerCounter, nextRound, roundCounter, cpuFullName };
 };
 
 function openInNewTab(href) {
@@ -408,8 +411,8 @@ MainGameLoop = (playerName) => {
     cpuFullName = info.cpuFullName(); // ? Get the name of the enemy cpu depending on the actual level 
 
     //The game loop should set up a new game by creating Players and Gameboards. 
-    const player_Gameboard = new Gameboard(10, 10, playerName);  // For now just populate each Gameboard with predetermined coordinates. 
-    const cpu_Gameboard = new Gameboard(10, 10, cpuFullName);  // For now just populate each Gameboard with predetermined coordinates. 
+    const player_Gameboard = new Gameboard(10, 10, playerName, info);  // For now just populate each Gameboard with predetermined coordinates. 
+    const cpu_Gameboard = new Gameboard(10, 10, cpuFullName, info);  // For now just populate each Gameboard with predetermined coordinates. 
   
     const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
     const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
@@ -419,9 +422,19 @@ MainGameLoop = (playerName) => {
     
     // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
 
-    TestPlayer.humanAttack(1, 3);
-    FirstComputer.cpuAttack();
-    TestPlayer.humanAttack(3, 1);
+    // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
+    interVal = 2000;
+    cpuAttackInterval =  setInterval(() => {
+        if(info.actualOnTurn() === `cpu`) {
+            FirstComputer.cpuAttack();
+            info.nextRound(); // ? Trigger next round from a cpu attack
+        };
+    }, interVal);
+    // clearInterval(cpuAttackInterval); // ? To clear the interval f.e. after the game end
+
+    // TestPlayer.humanAttack(1, 3);
+    // FirstComputer.cpuAttack();
+    // TestPlayer.humanAttack(3, 1);
 
     // ! You can implement a system for allowing players to place their ships later.
 // cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
