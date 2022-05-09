@@ -1,7 +1,7 @@
 const Ship = function (length) {
     // Ships will be objects that include their length, where they’ve been hit and whether or not they’ve been sunk
     
-      if(length < 1 || length === undefined) throw new Error("Ship must have a length.");
+      if(length < 1 || length === undefined) throw new Error("Ship must have a length between 2 and 5.");
       this.length = length;
   
       // Setup the ship sections depending on ther length
@@ -13,18 +13,21 @@ const Ship = function (length) {
       // Assign type to ship depening on its length
       type = '';
       switch (length) {
-        case 1:
-            type = 'cruiser';
-            break;
         case 2:
-          type = 'corvette';
+            type = 'Destroyer';
+            break;
+        case 3:
+          type = 'Submarine';
           break;
         case 3:
-          type = 'battleship';
+          type = 'Cruiser';
           break;
         case 4:
-          type = 'aircraft-carrier';
+          type = 'Battleship';
           break;
+        case 4:
+        type = 'Carrier';
+        break;
     };
   
       // Returns the actual states of the sections
@@ -88,29 +91,29 @@ const Ship = function (length) {
             };  
 
     // ! Players can take turns playing the game by attacking the enemy Gameboard.
-        humanAttack = (y, x) => {
-            // Argument validation
-            if(typeof y !== 'number' || typeof x !== 'number') throw new TypeError(`Only 'numbers' are allowed as arguments.`);
-            if(y >= enemyGameboard.sizeY || x >= enemyGameboard.sizeX) throw new RangeError(`For argument y max ${enemyGameboard.sizeY - 1} and for argument x max ${enemyGameboard.sizeX - 1} are allowed.`)
-            
-            if(human === true){ // ? Check for human player
-                row = enemyGameboard.gameboard[y - 1];
-                fieldNumber = row[x - 1];
-                if(enemyGameboard.missedAttacks.indexOf(fieldNumber) !== -1) throw new Error(`This field was attacked before`); // ? Check if the field was attacked before by checking the field number in the enemy missedAttacks array
-                result = enemyGameboard.receiveAttack(y, x); // ? Attack the enemy gameboard
-                return result 
-            } else throw new Error(`Computer Player must use cpuAttack()`);
-        };
+    humanAttack = (y, x) => {
+        // Argument validation
+        if(typeof y !== 'number' || typeof x !== 'number') throw new TypeError(`Only 'numbers' are allowed as arguments.`);
+        if(y >= enemyGameboard.sizeY || x >= enemyGameboard.sizeX) throw new RangeError(`For argument y max ${enemyGameboard.sizeY - 1} and for argument x max ${enemyGameboard.sizeX - 1} are allowed.`)
+        
+        if(human === true){ // ? Check for human player
+            row = enemyGameboard.gameboard[y - 1];
+            fieldNumber = row[x - 1];
+            if(enemyGameboard.missedAttacks.indexOf(fieldNumber) !== -1) throw new Error(`This field was attacked before`); // ? Check if the field was attacked before by checking the field number in the enemy missedAttacks array
+            result = enemyGameboard.receiveAttack(y, x); // ? Attack the enemy gameboard
+            return result 
+        } else throw new Error(`Computer Player must use cpuAttack()`);
+    };
 
     //#region Section exclusive for Computer Players 
     // ! The game is played against the computer, so make ‘computer’ players capable of making random plays. 
 
-    getRandomInt = (max) =>{
-        return Math.floor(Math.random() * max);
-      };
-
     getRandomAttackCo = () => {
-        rand = getRandomInt(enemyGameboard.sizeX * enemyGameboard.sizeY); // ? Get a random integer between 0 and the maximum field amount of the gameboard
+        rand = getRandomInt(enemyGameboard.sizeX * enemyGameboard.sizeY) + 1; // ? Get a random integer between 0 and the maximum field amount of the gameboard. +1 because the argument number itself can not be returned by getRandomInt()
+        if(rand === 0){ // ? Restart if rand is 0
+            getRandomAttackCo();
+            return
+        };
         for (row = 0; row < enemyGameboard.sizeY; row++){   // ? Loop trough the rows 
             if(enemyGameboard.gameboard[row].indexOf(rand) !== -1){ // ? Get the field via matching the random number with the field number in the row
                 grow = enemyGameboard.gameboard[row];
@@ -208,23 +211,26 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
     placement = (type, start, end) => {
 
         // ? Argument validation
-        if(typeof type !== 'string') throw new TypeError('Only the strings "cruiser", "corvette", "battleship" or "aircraft-carrier" are allowed as ship type. Default is "cruiser".')
+        if(typeof type !== 'string') throw new TypeError('Only the strings "Destroyer", "Submarine", "Destroyer", "Battleship"or "Carrier"are allowed as ship type.')
         if(Array.isArray(start) === false || Array.isArray(end) === false) throw new TypeError(`Only 'arrays' are allowed as start & end arguments.`);
         if(start.length + end.length !== 4) throw new Error('In each placement array 2 values are allowed: The x and the y coordinate values.');
 
         //  ? Create new ship for placement
         switch (type) {
-            case 'cruiser':
-                newShip = Ship(1);
-                break;
-            case 'corvette':
+            case 'Destroyer':
                 newShip = Ship(2);
                 break;
-            case 'battleship':
+            case 'Submarine':
                 newShip = Ship(3);
                 break;
-            case 'aircraft-carrier':
+            case 'Destroyer':
+                newShip = Ship(3);
+                break;
+            case 'Batlleship':
                 newShip = Ship(4);
+                break;
+            case 'Carrier':
+                newShip = Ship(5);
                 break;
         };
         // ? Finalize ship 
@@ -423,7 +429,11 @@ const GameInformation = function (playerName){
     return { playerName, actualOnTurn, newPlayer, playerCounter, nextRound, roundCounter, cpuFullName };
 };
 
-function openInNewTab(href) {
+getRandomInt = (max) =>{
+    return Math.floor(Math.random() * max);
+};
+
+openInNewTab = (href) => {
     Object.assign(document.createElement('a'), {
       target: '_blank',
       href: href,
@@ -441,14 +451,14 @@ MainGameLoop = (playerName) => {
     cpuFullName = info.cpuFullName(); // ? Get the name of the enemy cpu depending on the actual level 
 
     //The game loop should set up a new game by creating Players and Gameboards. 
-    const player_Gameboard = new Gameboard(10, 10, playerName, info);  // For now just populate each Gameboard with predetermined coordinates. 
-    const cpu_Gameboard = new Gameboard(10, 10, cpuFullName, info);  // For now just populate each Gameboard with predetermined coordinates. 
+    const player_Gameboard = new Gameboard(10, 10, playerName, info);  
+    const cpu_Gameboard = new Gameboard(10, 10, cpuFullName, info); 
   
     const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
     const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
-    player_Gameboard.placement("battleship", [3, 5], [3, 7]); // ? Placing a battleship on the gameboard in the 1 column from r ow 3 to 5
-    cpu_Gameboard.placement("battleship", [1, 1], [3, 1]);  
+    player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
+    cpu_Gameboard.placement("Submarine", [1, 1], [3, 1]);  
     
     // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
 
