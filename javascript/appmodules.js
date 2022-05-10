@@ -22,7 +22,7 @@ throw new Error(`Argument shipType must be Destroyer, Submarine, Cruiser, Battle
 calculateFieldID = (y, x) => {
     // ! Calculate the fieldID and the DOM-Element via the attack coordinates
     if(typeof y !== 'number' || typeof x !== 'number') throw new TypeError(`Only 'number' are allowed as argument types. You have passed ${typeof y} for the y and ${typeof x} for the x paramter`);
-    if( y < 1 || y > 10 || x < 1 || x > 10) throw new RangeError(`For the y or x argments only pasigs a 'number' between 1 and 10 is allowed You have passed  ${y} for the y and ${x} for the parameter`);
+    if( y < 1 || y > 10 || x < 1 || x > 10) throw new RangeError(`For the y or x argments only passing a 'number' between 1 and 10 is allowed You have passed  ${y} for the y and ${x} for the parameter`);
     
     if(y === 1){ // ?  If the row is 0 or in other words y = 1 
         res = x;    // ? fieldID is exactly the x value (column)
@@ -368,7 +368,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                 for(y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
                     row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
                     
-                    fieldIDPlacement = calculateFieldID(start[0], y);
+                    fieldIDPlacement = calculateFieldID(start[0], y +1);
                    
                     // ? With the field id place the ship in the corresponend DOM-Element 
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
@@ -387,7 +387,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             for(x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
                 row = gameboard[x];  // ? Get the correct row in this loop round
 
-                fieldIDPlacement =  calculateFieldID(x , start[1]);   // ? Get fieldID 
+                fieldIDPlacement =  calculateFieldID(x +1 , start[1]);   // ? Get fieldID 
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
