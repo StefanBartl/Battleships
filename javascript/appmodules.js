@@ -75,7 +75,7 @@ getRandomYCPUValues = (sizeY) => {
 randomShipPlacementValues = (shipType, sizeY, sizeX) => {
     if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
     shipLength = getShipLength(shipType);
-    console.log(`random ship Placement val: ${shipType}, ${sizeY}, ${sizeX}`);
+    console.log(`random ship Placement val: ${shipType}, ${shipLength} (length),  ${sizeY}, ${sizeX}`);
 
     // ? Random Destroyer placement
     direction =  getRandomDirection();
@@ -99,6 +99,51 @@ randomShipPlacementValues = (shipType, sizeY, sizeX) => {
         console.log({direction: direction, shipType: shipType, start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]});
         return {start: [yValue, xValue], end: [yValue + shipLength - 1, xValue]};
     };
+};
+
+proofFieldForFree = (coordinates, playerToProof) => {
+
+    if(coordinates.start[0] === coordinates.end[0]){// ? Difference is the number of fields
+        counter = coordinates.end[1] - coordinates.start[1];
+        for(x = 0; x < counter; x++){
+            val = coordinates.start[1] + x;
+            console.log(`Validation:`);
+            console.log(coordinates.start[0], val);
+            fielID = calculateFieldID(coordinates.start[0], val);
+            console.log(`FielID: ${fieldID}`);
+            valDOMElement = document.querySelector(`.${playerToProof.name}${fieldID}`);
+            console.log(`val DOM Element:`);
+            console.log(valDOMElement);
+            valAtt = valDOMElement.getAttribute(`data-occupied`);
+            console.log(`Occupied`);
+            console.log(valAtt);
+            if(valAtt === `true` || valAtt === `true`){
+               return false;
+               };
+        };
+        return true
+    };
+    
+    if(coordinates.start[1] === coordinates.end[1]){
+        counter = coordinates.end[0] - coordinates.start[0]; // ? Difference is the number of fields
+        for(x = 0; x < counter; x++){
+            val = coordinates.start[0] + x;
+            console.log(`Validation:`);
+            console.log(val, coordinates.start[1]);
+            fieldID = calculateFieldID(val, coordinates.start[1]);
+            console.log(`FielID: ${fieldID}`);
+            valDOMElement = document.querySelector(`.${playerToProof.name}${fieldID}`);
+            console.log(`val DOM Element:`);
+            console.log(valDOMElement);
+            valAtt = valDOMElement.getAttribute(`data-occupied`);
+            console.log(`Occupied`);
+            console.log(valAtt);
+            if(valAtt === `true` || valAtt === `true`){
+               return false;
+               };
+        };
+        return true
+        };
 };
 
 const Ship = function (length) {
@@ -369,7 +414,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                     row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
                     
                     fieldIDPlacement = calculateFieldID(start[0], y +1);
-                   
+                   console.log(`FieldID${fieldIDPlacement}`);
                     // ? With the field id place the ship in the corresponend DOM-Element 
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
@@ -388,6 +433,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                 row = gameboard[x];  // ? Get the correct row in this loop round
 
                 fieldIDPlacement =  calculateFieldID(x +1 , start[1]);   // ? Get fieldID 
+                console.log(`FieldID${fieldIDPlacement}`);
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
@@ -570,26 +616,11 @@ MainGameLoop = (playerName) => {
                 randomPlacement(player, shipType);
                 return;
             };
-            
-            console.log(`Coordinats ${coordinates}`);
+            console.log(`Coordinats ${coordinates}`);     
 
-            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
-            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
-        
-            console.log(val1);
-            console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
-            console.log(val1Element);
-            console.log(val2Element);
-            val1Att = val1Element.getAttribute(`data-occupied`);
-            val2Att = val1Element.getAttribute(`data-occupied`);
-            console.log(val1Att, val2Att);
-            if(val1Att === `true` || val2Att === `true`){
-                 randomPlacement(player, shipType);
-                return;
-                };
-
+            freeField = proofFieldForFree(coordinates, FirstComputer);
+            if(freeField === false) randomPlacement(player, shipType);
+  
             if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             // console.log(`Random placement of ${shipType} succesfull`);
@@ -602,24 +633,10 @@ MainGameLoop = (playerName) => {
                 randomPlacement(player, shipType);
                 return;
             };
-            
+        
             console.log(`Coordinats ${coordinates}`);
-
-            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
-            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
-            console.log(val1);
-            console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
-            console.log(val1Element);
-            console.log(val2Element);
-            val1Att = val1Element.getAttribute(`data-occupied`);
-            val2Att = val1Element.getAttribute(`data-occupied`);
-            console.log(val1Att, val2Att);
-            if(val1Att === `true` || val2Att === `true`){
-                 randomPlacement(player, shipType);
-                return;
-                };
+            freeField = proofFieldForFree(coordinates, FirstComputer);
+            if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -635,22 +652,8 @@ MainGameLoop = (playerName) => {
             };
             
             console.log(`Coordinats ${coordinates}`);
-
-            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
-            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
-            console.log(val1);
-            console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
-            console.log(val1Element);
-            console.log(val2Element);
-            val1Att = val1Element.getAttribute(`data-occupied`);
-            val2Att = val1Element.getAttribute(`data-occupied`);
-            console.log(val1Att, val2Att);
-            if(val1Att === `true` || val2Att === `true`){
-                 randomPlacement(player, shipType);
-                return;
-                };
+            freeField = proofFieldForFree(coordinates, FirstComputer);
+            if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -666,22 +669,8 @@ MainGameLoop = (playerName) => {
             };
             
             console.log(`Coordinats ${coordinates}`);
-
-            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
-            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
-            console.log(val1);
-            console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
-            console.log(val1Element);
-            console.log(val2Element);
-            val1Att = val1Element.getAttribute(`data-occupied`);
-            val2Att = val1Element.getAttribute(`data-occupied`);
-            console.log(val1Att, val2Att);
-            if(val1Att === `true` || val2Att === `true`){
-                 randomPlacement(player, shipType);
-                return;
-                };
+            freeField = proofFieldForFree(coordinates, FirstComputer);
+            if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -695,24 +684,10 @@ MainGameLoop = (playerName) => {
                 randomPlacement(player, shipType);
                 return;
             };
-            
+    
             console.log(`Coordinats ${coordinates}`);
-
-            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
-            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
-            console.log(val1);
-            console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
-            console.log(val1Element);
-            console.log(val2Element);
-            val1Att = val1Element.getAttribute(`data-occupied`);
-            val2Att = val1Element.getAttribute(`data-occupied`);
-            console.log(val1Att, val2Att);
-            if(val1Att === `true` || val2Att === `true`){
-                 randomPlacement(player, shipType);
-                return;
-                };
+            freeField = proofFieldForFree(coordinates, FirstComputer);
+            if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
