@@ -367,7 +367,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
          if(start[0] === end[0]){ // ? Get the placement direction, here like --
                 for(y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
                     row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
-                    fieldIDPlacement = `${start[0]}${start[1]}` ; // ? Get fieldID 
+                    
+                    fieldIDPlacement = calculateFieldID(start[0], y);
                    
                     // ? With the field id place the ship in the corresponend DOM-Element 
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
@@ -385,7 +386,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         if(start[1] === end[1]){ // ? Get placement direction, here |
             for(x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
                 row = gameboard[x];  // ? Get the correct row in this loop round
-                fieldIDPlacement = `${start[0]}${start[1]}` ; // ? Get fieldID 
+
+                fieldIDPlacement =  calculateFieldID(x , start[1]);   // ? Get fieldID 
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
@@ -607,8 +609,8 @@ MainGameLoop = (playerName) => {
             val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
             console.log(val1);
             console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1[0]}${val1[1]}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2[0]}${val2[1]}`);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
             console.log(val1Element);
             console.log(val2Element);
             val1Att = val1Element.getAttribute(`data-occupied`);
@@ -669,8 +671,8 @@ MainGameLoop = (playerName) => {
             val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
             console.log(val1);
             console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1[0]}${val1[1]}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2[0]}${val2[1]}`);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
             console.log(val1Element);
             console.log(val2Element);
             val1Att = val1Element.getAttribute(`data-occupied`);
@@ -700,8 +702,8 @@ MainGameLoop = (playerName) => {
             val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
             console.log(val1);
             console.log(val2);
-            val1Element = document.querySelector(`.${FirstComputer.name}${val1[0]}${val1[1]}`);
-            val2Element = document.querySelector(`.${FirstComputer.name}${val2[0]}${val2[1]}`);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
             console.log(val1Element);
             console.log(val2Element);
             val1Att = val1Element.getAttribute(`data-occupied`);
