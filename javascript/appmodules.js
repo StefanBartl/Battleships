@@ -1,3 +1,106 @@
+getRandomInt = (max) =>{
+    return Math.floor(Math.random() * max);
+};
+
+openInNewTab = (href) => {
+    Object.assign(document.createElement('a'), {
+      target: '_blank',
+      href: href,
+    }).click();
+};
+
+getShipLength = (shipType) =>{
+if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
+if(shipType === `Destroyer`) return 2;
+if(shipType === `Submarine`) return 3;
+if(shipType === `Cruiser`) return 3;
+if(shipType === `Battleship`) return 4;
+if(shipType === `Carrier`) return 5;
+throw new Error(`Argument shipType must be Destroyer, Submarine, Cruiser, Battleship or Carrier 'string'`);
+};
+
+calculateFieldID = (y, x) => {
+    // ! Calculate the fieldID and the DOM-Element via the attack coordinates
+    if(typeof y !== 'number' || typeof x !== 'number') throw new TypeError(`Only 'number' are allowed as argument types. You have passed ${typeof y} for the y and ${typeof x} for the x paramter`);
+    if( y < 1 || y > 10 || x < 1 || x > 10) throw new RangeError(`For the y or x argments only pasigs a 'number' between 1 and 10 is allowed You have passed  ${y} for the y and ${x} for the parameter`);
+    
+    if(y === 1){ // ?  If the row is 0 or in other words y = 1 
+        res = x;    // ? fieldID is exactly the x value (column)
+        return res;
+    };
+    
+    if (y > 1 && y < 11){ // ? If the fieldID is between 11 & 99 the row is between 1 & 11
+        if(x === 10){ // ? If x = 10
+            yVal = y;
+            xVal= 0;
+            res = parseInt(`${yVal}${xVal}`);
+            return res;
+        };
+        if(x !== 10){
+        yVal = y - 1;  // ?  First digit is y-1 f.e. row 3 column 1 (1, 3) the field id is 21
+        xVal = x;
+        res = parseInt(`${yVal}${xVal}`);
+        return res;
+        };
+    };
+
+};
+
+getRandomDirection = () => {
+    // ? Randomize in which direction ship is placed. (  horizontal -- or vertical  |  )
+    // randomDirection = getRandomInt(2);
+    if(getRandomInt(2) === 0){
+         return `horizontal`       // ?   --
+    } else return `vertical`;    // ? |
+};
+
+getRandomXCPUValues = (sizeX) => {
+    xValue = getRandomInt(sizeX + 1);
+    if(xValue === 0 || typeof xValue !== 'number' || typeof xValue === undefined) {
+        getRandomXCPUValues();
+        return;
+    };
+    return xValue;
+};
+
+getRandomYCPUValues = (sizeY) => {
+    yValue = getRandomInt(sizeY + 1);
+    if(yValue === 0 || typeof yValue !== 'number' | typeof yValue === undefined) {
+        getRandomYCPUValues();
+        return;
+    };
+    return yValue;
+};
+
+randomShipPlacementValues = (shipType, sizeY, sizeX) => {
+    if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
+    shipLength = getShipLength(shipType);
+    console.log(`random ship Placement val: ${shipType}, ${sizeY}, ${sizeX}`);
+
+    // ? Random Destroyer placement
+    direction =  getRandomDirection();
+    if (direction === `horizontal`){ // ? --
+        xValue =  getRandomXCPUValues(sizeX - shipLength - 1);
+        // if(xValue === 0 || typeof xValue !== 'number' || typeof xValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
+        console.log(`direction x val: `, direction, xValue);
+        yValue = getRandomYCPUValues(sizeY);
+        // if(yValue === 0 || typeof yValue !== 'number' || typeof yValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
+
+        console.log({start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]});
+        return {direction: direction, shipType: shipType, start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]};
+    };
+    if (direction === `vertical`){ // ? |
+        xValue =  getRandomXCPUValues(sizeX);
+        // if(xValue === 0 || typeof xValue !== 'number' || typeof xValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
+        console.log(`direction x val: `, direction, xValue);
+        yValue = getRandomYCPUValues(sizeY - shipLength - 1);
+        // if(yValue === 0 || typeof yValue !== 'number' || typeof yValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
+
+        console.log({direction: direction, shipType: shipType, start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]});
+        return {start: [yValue, xValue], end: [yValue + shipLength - 1, xValue]};
+    };
+};
+
 const Ship = function (length) {
     // Ships will be objects that include their length, where they’ve been hit and whether or not they’ve been sunk
     
@@ -192,6 +295,9 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             field.setAttribute(`data-fieldID`, fieldID);
             field.setAttribute(`data-fieldY`, y);
             field.setAttribute(`data-fieldX`, x);
+            field.setAttribute(`data-playerFieldID`, player+fieldID);
+            field.setAttribute(`data-occupied`, `false`);
+            field.classList.add(player);
             field.classList.add(player+ fieldID);
             field.innerText = fieldID;
 
@@ -211,10 +317,13 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
     placement = (type, start, end) => {
 
         // ? Argument validation
-        if(typeof type !== 'string') throw new TypeError('Only the strings "Destroyer", "Submarine", "Destroyer", "Battleship"or "Carrier"are allowed as ship type.')
+        if(typeof type !== 'string') throw new TypeError('Only the strings "Destroyer", "Submarine", "Cruiser", "Battleship"or "Carrier"are allowed as ship type.')
         if(Array.isArray(start) === false || Array.isArray(end) === false) throw new TypeError(`Only 'arrays' are allowed as start & end arguments.`);
         if(start.length + end.length !== 4) throw new Error('In each placement array 2 values are allowed: The x and the y coordinate values.');
 
+        console.log(`start/end`);
+        console.log(start);
+        console.log(end);
         //  ? Create new ship for placement
         switch (type) {
             case 'Destroyer':
@@ -226,12 +335,14 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             case 'Cruiser':
                 newShip = Ship(3);
                 break;
-            case 'Batlleship':
+            case 'Battleship':
                 newShip = Ship(4);
                 break;
             case 'Carrier':
                 newShip = Ship(5);
                 break;
+                default:
+                    throw new Error(`Only the strings "Destroyer", "Submarine", "Cruiser", "Battleship"or "Carrier"are allowed as ship type.`);
         };
         // ? Finalize ship 
         newShip.ID = shipIDCounter;
@@ -256,12 +367,15 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
          if(start[0] === end[0]){ // ? Get the placement direction, here like --
                 for(y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
                     row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
-                    fieldIDPlacement = row[y] ; // ? Get fieldID via row and the increasing column number between start[0] and end[0] 
+                    fieldIDPlacement = `${start[0]}${start[1]}` ; // ? Get fieldID 
                    
                     // ? With the field id place the ship in the corresponend DOM-Element 
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
                     fieldAtDOM.classList.add(`${player}${newShip.ID}`)
+                    fieldAtDOM.setAttribute(`data-occupied`, `true`);
+                    fieldAtDOM.setAttribute(`data-type`, type);
+                    fieldAtDOM.setAttribute(`data-section`, section);
                     // ? Finalize ship placement in the gameboard array
                     row[y] = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                     section++; // ? Ship section is placed on the gameboard
@@ -271,12 +385,15 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         if(start[1] === end[1]){ // ? Get placement direction, here |
             for(x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
                 row = gameboard[x];  // ? Get the correct row in this loop round
-                fieldIDPlacement = row[start[1] - 1] ;  // ? Get fieldID via increasing row and the column, which stays the same for the whole | placement
+                fieldIDPlacement = `${start[0]}${start[1]}` ; // ? Get fieldID 
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                 fieldAtDOM.innerText = `${type}${section}`;
                 fieldAtDOM.classList.add(`${player}${newShip.ID}`)
+                fieldAtDOM.setAttribute(`data-occupied`, `true`);
+                fieldAtDOM.setAttribute(`data-type`, type);
+                fieldAtDOM.setAttribute(`data-section`, section);
 
                 // ? Finalize ship placement in the gameboard array
                 row[start[1] - 1]  = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
@@ -306,24 +423,11 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         gameboard_row = gameboard[y-1]; // ? Get the gameboard row of the attacked cell
         attackedFieldID = gameboard_row[x-1];
         
-        // ! Calculate the fieldID and the DOM-Element via the attack coordinates
-        if(y === 1){
-            res = x;    // ? If the row is 0, the fieldID is exactly the x value (column)
-        };
 
-        if(y > 1){ // ? If row (y) is over 1.. (row 2 begins with 11) 
-            yVal = y-1; // ? The first digit of the result is y-1 (row 2 starts with 11, row 3 starts with 21...) 
-            if(x < 10){ // ? But the x value is under 10...
-                res = parseInt(`${yVal}${x}`);
-            };
-            if(x >= 10){ // ? If the x is over 9 we have to increase the y to...
-                xString = `${x}`; // ? Get the 2 digit via string
-                xVal = parseInt(xString[2]); // ? tranform it to number
-                yIncrease = parseInt(xString[1]); // ? Get the 1 digit via string
-                yVal +=yIncrease; // ? Increase y
-                res = parseInt(`${yVal}${xVal}`) // ? Get the result
-            };
-        };
+        fieldIDArray = calculateFieldID(y, x);
+        y = fieldIDArray[0];
+        x = fieldIDArray[1];
+
         attackedFieldAtDOM = document.querySelector(`.${player}${res}`); // ? Get the attacked field as DOM-Element
 
         // ! Proof if the attack hitted a ship or not
@@ -429,70 +533,6 @@ const GameInformation = function (playerName){
     return { playerName, actualOnTurn, newPlayer, playerCounter, nextRound, roundCounter, cpuFullName };
 };
 
-getRandomInt = (max) =>{
-    return Math.floor(Math.random() * max);
-};
-
-openInNewTab = (href) => {
-    Object.assign(document.createElement('a'), {
-      target: '_blank',
-      href: href,
-    }).click();
-};
-
-getShipLength = (shipType) =>{
-if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
-if(shipType === `Destroyer`) return 2;
-if(shipType === `Submarine`) return 3;
-if(shipType === `Cruiser`) return 3;
-if(shipType === `Battleship`) return 4;
-if(shipType === `Carrier`) return 5;
-throw new Error(`Argument shipType must be Destroyer, Submarine, Cruiser, Battleship or Carrier 'string'`);
-};
-
-getRandomDirection = () => {
-    // ? Randomize in which direction ship is placed. (  horizontal -- or vertical  |  )
-    // randomDirection = getRandomInt(2);
-    if(getRandomInt(2) === 0){
-         return `horizontal`       // ?   --
-    } else return `vertical`;    // ? |
-};
-
-getRandomXCPUValues = (sizeX) => {
-    xValue = getRandomInt(sizeX + 1);
-    if(xValue === 0 || typeof xValue !== 'number') {
-        getRandomXCPUValues();
-        return;
-    };
-    return xValue;
-};
-
-getRandomYCPUValues = (sizeY) => {
-    yValue = getRandomInt(sizeY + 1);
-    if(yValue === 0 || typeof yValue !== 'number') {
-        getRandomYCPUValues();
-        return;
-    };
-    return yValue;
-};
-
-randomShipPlacementValues = (shipType) => {
-    if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
-    shipLength = getShipLength(shipType);
-
-    // ? Random Destroyer placement
-    direction =  getRandomDirection();
-    if (direction === `horizontal`){ // ? --
-    xValue =  getRandomXCPUValues(cpu_Gameboard.sizeX - shipLength);
-        yValue = getRandomYCPUValues(cpu_Gameboard.sizeY);
-        return {start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]};
-    };
-    if (direction === `vertical`){ // ? |
-        xValue =  getRandomXCPUValues(cpu_Gameboard.sizeX);
-        yValue = getRandomYCPUValues(cpu_Gameboard.sizeY - shipLength - 1);
-        return {start: [yValue, xValue], end: [yValue + shipLength - 1, xValue]};
-    };
-};
 
 MainGameLoop = (playerName) => {
     if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
@@ -503,25 +543,200 @@ MainGameLoop = (playerName) => {
   
     const info = new GameInformation(playerName); // ? Open new GameInformation object  
     cpuFullName = info.cpuFullName(); // ? Get the name of the enemy cpu depending on the actual level 
+    cpuName = cpuFullName.name;
 
     //The game loop should set up a new game by creating Players and Gameboards. 
     const player_Gameboard = new Gameboard(10, 10, playerName, info);  
     const cpu_Gameboard = new Gameboard(10, 10, cpuFullName, info); 
   
     const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
-    const FirstComputer = new Player('First Computer', false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
+    const FirstComputer = new Player(cpuName, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
     player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
  
 
-    randomCPUPlacement = () => {
+    
+    randomPlacement = (player, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
+        // ? Argument validation
+        if(typeof player !== 'string') throw new TypeError('Only strings are allowed as player arguments.');
+        if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
+        console.log(`Random ${shipType} placement for ${player}`);
+        
+        if(shipType === `Destroyer`){
+            coordinates = randomShipPlacementValues(`Destroyer`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+                randomPlacement(player, shipType);
+                return;
+            };
+            
+            console.log(`Coordinats ${coordinates}`);
 
-        destroyerCoordinates = randomShipPlacementValues(`Submarine`);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-        cpu_Gameboard.placement("Submarine", [destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);  
+            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
+            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
+        
+            console.log(val1);
+            console.log(val2);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
+            console.log(val1Element);
+            console.log(val2Element);
+            val1Att = val1Element.getAttribute(`data-occupied`);
+            val2Att = val1Element.getAttribute(`data-occupied`);
+            console.log(val1Att, val2Att);
+            if(val1Att === `true` || val2Att === `true`){
+                 randomPlacement(player, shipType);
+                return;
+                };
+
+            if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            // console.log(`Random placement of ${shipType} succesfull`);
+            return true;
+        };
+
+        if(shipType === `Submarine`){
+            coordinates = randomShipPlacementValues(`Submarine`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+                randomPlacement(player, shipType);
+                return;
+            };
+            
+            console.log(`Coordinats ${coordinates}`);
+
+            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
+            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
+            console.log(val1);
+            console.log(val2);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1[0]}${val1[1]}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2[0]}${val2[1]}`);
+            console.log(val1Element);
+            console.log(val2Element);
+            val1Att = val1Element.getAttribute(`data-occupied`);
+            val2Att = val1Element.getAttribute(`data-occupied`);
+            console.log(val1Att, val2Att);
+            if(val1Att === `true` || val2Att === `true`){
+                 randomPlacement(player, shipType);
+                return;
+                };
+
+            if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            // console.log(`Random placement of ${shipType} succesfull`);
+            return true;
+        };
+
+        if(shipType === `Cruiser`){
+            coordinates = randomShipPlacementValues(`Cruiser`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+                randomPlacement(player, shipType);
+                return;
+            };
+            
+            console.log(`Coordinats ${coordinates}`);
+
+            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
+            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
+            console.log(val1);
+            console.log(val2);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2}`);
+            console.log(val1Element);
+            console.log(val2Element);
+            val1Att = val1Element.getAttribute(`data-occupied`);
+            val2Att = val1Element.getAttribute(`data-occupied`);
+            console.log(val1Att, val2Att);
+            if(val1Att === `true` || val2Att === `true`){
+                 randomPlacement(player, shipType);
+                return;
+                };
+
+            if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            // console.log(`Random placement of ${shipType} succesfull`);
+            return true;
+        };
+
+        if(shipType === `Battleship`){
+            coordinates = randomShipPlacementValues(`Battleship`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+                randomPlacement(player, shipType);
+                return;
+            };
+            
+            console.log(`Coordinats ${coordinates}`);
+
+            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
+            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
+            console.log(val1);
+            console.log(val2);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1[0]}${val1[1]}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2[0]}${val2[1]}`);
+            console.log(val1Element);
+            console.log(val2Element);
+            val1Att = val1Element.getAttribute(`data-occupied`);
+            val2Att = val1Element.getAttribute(`data-occupied`);
+            console.log(val1Att, val2Att);
+            if(val1Att === `true` || val2Att === `true`){
+                 randomPlacement(player, shipType);
+                return;
+                };
+
+            if(player === `human`)  player_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            if(player === `cpu`)  cpu_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            // console.log(`Random placement of ${shipType} succesfull`);
+            return true;
+        };
+
+        if(shipType === `Carrier`){
+            coordinates = randomShipPlacementValues(`Carrier`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+                randomPlacement(player, shipType);
+                return;
+            };
+            
+            console.log(`Coordinats ${coordinates}`);
+
+            val1 = calculateFieldID(coordinates.start[0], coordinates.start[1]);
+            val2 = calculateFieldID(coordinates.end[0], coordinates.end[1]);
+            console.log(val1);
+            console.log(val2);
+            val1Element = document.querySelector(`.${FirstComputer.name}${val1[0]}${val1[1]}`);
+            val2Element = document.querySelector(`.${FirstComputer.name}${val2[0]}${val2[1]}`);
+            console.log(val1Element);
+            console.log(val2Element);
+            val1Att = val1Element.getAttribute(`data-occupied`);
+            val2Att = val1Element.getAttribute(`data-occupied`);
+            console.log(val1Att, val2Att);
+            if(val1Att === `true` || val2Att === `true`){
+                 randomPlacement(player, shipType);
+                return;
+                };
+
+            if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+            // console.log(`Random placement of ${shipType} succesfull`);
+            return true;
+        };
+
+        throw new Error(`Only the strings 'Destroyer', 'Submarine', 'Cruiser', 'Battleship' or 'Carrier' are allowed as ship type.`) // ? If nothing returned before there must be a problem with the shipType string
 
     };
-    // ! Validation for occupied fields
-    randomCPUPlacement();
+
+    des = randomPlacement(`cpu`, `Destroyer`);
+    if(des !== true) randomPlacement(`cpu`, `Destroyer`);
+
+    sub = randomPlacement(`cpu`, `Submarine`);
+    if(sub !== true) randomPlacement(`cpu`, `Submarine`);
+    
+    cru = randomPlacement(`cpu`, `Cruiser`);
+    if(cru !== true) randomPlacement(`cpu`, `Cruiser`);
+
+    bat = randomPlacement(`cpu`, `Battleship`);
+    if(bat !== true) randomPlacement(`cpu`, `Battleship`);
+    
+    car = randomPlacement(`cpu`, `Carrier`);
+    if(car !== true)  randomPlacement(`cpu`, `Carrier`);
+    
 
     
     // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
