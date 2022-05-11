@@ -394,6 +394,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
                     fieldAtDOM.classList.add(`${player}${newShip.ID}`)
+                    fieldAtDOM.classList.add(`${player}${type}`);
                     fieldAtDOM.setAttribute(`data-occupied`, `true`);
                     fieldAtDOM.setAttribute(`data-type`, type);
                     fieldAtDOM.setAttribute(`data-section`, section);
@@ -447,8 +448,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
 
         // ! Attack a ship
         if(typeof attackedFieldInGameboard !== 'number') { // ? If the attacked cell is not a number, so a ship object is in,  its a hit..
-            attackedShipID = gameboard_row[x - 1].ID; // ? Get the attacked ship ID
-            console.log(attackedShipID);
+            attackedShipID = attackedFieldInGameboard.ID; // ? Get the attacked ship ID
+            attackedShipType = attackedFieldInGameboard.Type;
             attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
             attackedShipAtDOMArray = document.getElementsByClassName (`${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
 
