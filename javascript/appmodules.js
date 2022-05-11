@@ -233,10 +233,9 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
     // ! The game is played against the computer, so make ‘computer’ players capable of making random plays. 
 
     getRandomAttackCo = () => {
-        rand = getRandomInt(enemyGameboard.sizeX * enemyGameboard.sizeY) + 1; // ? Get a random integer between 0 and the maximum field amount of the gameboard. +1 because the argument number itself can not be returned by getRandomInt()
+        rand = getRandomInt(enemyGameboard.sizeY * enemyGameboard.sizeX) + 1 ; // ? Get a random integer between 0 and the maximum field amount of the gameboard. +1 because the argument number itself can not be returned by getRandomInt()
         if(rand === 0){ // ? Restart if rand is 0
-            getRandomAttackCo();
-            return
+            return false;
         };
         for (row = 0; row < enemyGameboard.sizeY; row++){   // ? Loop trough the rows 
             if(enemyGameboard.gameboard[row].indexOf(rand) !== -1){ // ? Get the field via matching the random number with the field number in the row
@@ -253,14 +252,20 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
     getValidRandomAttackCo = () => {
         validCoordinates = getRandomAttackCo(); // ? Invoke getRandomAttackCo() to either get coordinates or false
         if(validCoordinates === false || validCoordinates ===  undefined){
-            getRandomAttackCo(); } // ? If no valid coordinates are returned, invoke it again
-                return validCoordinates; // ? If coordinates are received, return it        
+            getRandomAttackCo();
+            return; // ? If no valid coordinates are returned, invoke it again
+        }; 
+            return validCoordinates; // ? If coordinates are received, return it        
     };
 
     // ! The AI does not have to be smart, but it should know whether or not a given move is legal. (i.e. it shouldn’t shoot the same coordinate twice).
     cpuAttack = () => {
         if(human === false){ // ? Only allow computer  player
             randomCoordinates = getValidRandomAttackCo(); // ? Get valid coordinates
+            if(typeof randomCoordinates[0] !== 'number' || typeof randomCoordinates[1] !== 'number'){
+                cpuAttack();
+                return;
+            };
             result = enemyGameboard.receiveAttack(randomCoordinates[0] + 1, randomCoordinates[1] + 1); // ? Attack the enemy gameboard
             return result
         } else throw new Error(`Humans must use humanAttack()`);
@@ -443,7 +448,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         // ! Attack a ship
         if(typeof attackedFieldInGameboard !== 'number') { // ? If the attacked cell is not a number, so a ship object is in,  its a hit..
             attackedShipID = gameboard_row[x - 1].ID; // ? Get the attacked ship ID
-            attackedShipInFormation = shipFormation[attackedShipID[3]]; // ? Get the attacked ship object in the shipFormation array
+            console.log(attackedShipID);
+            attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
             attackedShipAtDOMArray = document.getElementsByClassName (`${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
 
             // ! Hit the ship
@@ -549,27 +555,33 @@ MainGameLoop = (playerName) => {
     const player_Gameboard = new Gameboard(10, 10, playerName, info);  
     const cpu_Gameboard = new Gameboard(10, 10, `CPU`, info); 
   
-    const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
-    const FirstComputer = new Player(`CPU`, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
+    const Human = new Player('Human', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
+    const CPU = new Player(`CPU`, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
     player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
  
 
     
-    randomPlacement = (player, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
+    randomPlacement = (player, gameboard, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
         // ? Argument validation
         if(typeof player !== 'string') throw new TypeError('Only strings are allowed as player arguments.');
         if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
         
+        this.player = player;
+        this.ship = shipType;
+        this.gameboard = gameboard;
+        sizeY = gameboard.sizeY;
+        sizeX = gameboard.sizeX;
+        
         if(shipType === `Destroyer`){
-            coordinates = randomShipPlacementValues(`Destroyer`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            coordinates = randomShipPlacementValues(`Destroyer`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
             if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, shipType);
+                randomPlacement(player, gameboard, shipType);
                 return;
             };
 
-            freeField = proofFieldForFree(coordinates, FirstComputer);
-            if(freeField === false) randomPlacement(player, shipType);
+            freeField = proofFieldForFree(coordinates, CPU);
+            if(freeField === false) randomPlacement(player, gameboard, shipType);
   
             if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -577,14 +589,14 @@ MainGameLoop = (playerName) => {
         };
 
         if(shipType === `Submarine`){
-            coordinates = randomShipPlacementValues(`Submarine`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            coordinates = randomShipPlacementValues(`Submarine`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
             if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, shipType);
+                randomPlacement(player, gameboard, shipType);
                 return;
             };
         
-            freeField = proofFieldForFree(coordinates, FirstComputer);
-            if(freeField === false) randomPlacement(player, shipType);
+            freeField = proofFieldForFree(coordinates, CPU);
+            if(freeField === false) randomPlacement(player, gameboard, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -592,14 +604,14 @@ MainGameLoop = (playerName) => {
         };
 
         if(shipType === `Cruiser`){
-            coordinates = randomShipPlacementValues(`Cruiser`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            coordinates = randomShipPlacementValues(`Cruiser`,  sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
             if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, shipType);
+                randomPlacement(player, gameboard, shipType);
                 return;
             };
             
-            freeField = proofFieldForFree(coordinates, FirstComputer);
-            if(freeField === false) randomPlacement(player, shipType);
+            freeField = proofFieldForFree(coordinates, CPU);
+            if(freeField === false) randomPlacement(player, gameboard, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -607,14 +619,14 @@ MainGameLoop = (playerName) => {
         };
 
         if(shipType === `Battleship`){
-            coordinates = randomShipPlacementValues(`Battleship`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            coordinates = randomShipPlacementValues(`Battleship`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
             if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, shipType);
+                randomPlacement(player, gameboard, shipType);
                 return;
             };
             
-            freeField = proofFieldForFree(coordinates, FirstComputer);
-            if(freeField === false) randomPlacement(player, shipType);
+            freeField = proofFieldForFree(coordinates, CPU);
+            if(freeField === false) randomPlacement(player, gameboard, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -623,14 +635,14 @@ MainGameLoop = (playerName) => {
         };
 
         if(shipType === `Carrier`){
-            coordinates = randomShipPlacementValues(`Carrier`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+            coordinates = randomShipPlacementValues(`Carrier`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
             if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, shipType);
+                randomPlacement(player, gameboard, shipType);
                 return;
             };
     
-            freeField = proofFieldForFree(coordinates, FirstComputer);
-            if(freeField === false) randomPlacement(player, shipType);
+            freeField = proofFieldForFree(coordinates, CPU);
+            if(freeField === false) randomPlacement(player, gameboard, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
@@ -641,20 +653,20 @@ MainGameLoop = (playerName) => {
 
     };
 
-    des = randomPlacement(`cpu`, `Destroyer`);
-    if(des !== true) randomPlacement(`cpu`, `Destroyer`);
+    des = randomPlacement(`cpu`, cpu_Gameboard,  `Destroyer`);
+    if(des !== true) randomPlacement(`cpu`, cpu_Gameboard, `Destroyer`);
 
-    sub = randomPlacement(`cpu`, `Submarine`);
-    if(sub !== true) randomPlacement(`cpu`, `Submarine`);
+    sub = randomPlacement(`cpu`, cpu_Gameboard,  `Submarine`);
+    if(sub !== true) randomPlacement(`cpu`, cpu_Gameboard, `Submarine`);
     
-    cru = randomPlacement(`cpu`, `Cruiser`);
-    if(cru !== true) randomPlacement(`cpu`, `Cruiser`);
+    cru = randomPlacement(`cpu`, cpu_Gameboard, `Cruiser`);
+    if(cru !== true) randomPlacement(`cpu`, cpu_Gameboard, `Cruiser`);
 
-    bat = randomPlacement(`cpu`, `Battleship`);
-    if(bat !== true) randomPlacement(`cpu`, `Battleship`);
+    bat = randomPlacement(`cpu`, cpu_Gameboard, `Battleship`);
+    if(bat !== true) randomPlacement(`cpu`, cpu_Gameboard, `Battleship`);
     
-    car = randomPlacement(`cpu`, `Carrier`);
-    if(car !== true)  randomPlacement(`cpu`, `Carrier`);
+    car = randomPlacement(`cpu`, cpu_Gameboard, `Carrier`);
+    if(car !== true)  randomPlacement(`cpu`, cpu_Gameboard, `Carrier`);
     
 
     
@@ -664,7 +676,7 @@ MainGameLoop = (playerName) => {
     interVal = 2000;
     cpuAttackInterval =  setInterval(() => {
         if(info.actualOnTurn() === `cpu`) {
-            FirstComputer.cpuAttack();
+            CPU.cpuAttack();
             info.nextRound(); // ? Trigger next round from a cpu attack
         };
     }, interVal);
