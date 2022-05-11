@@ -451,7 +451,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             attackedShipID = attackedFieldInGameboard.ID; // ? Get the attacked ship ID
             attackedShipType = attackedFieldInGameboard.Type;
             attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
-            attackedShipAtDOMArray = document.getElementsByClassName (`${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
+            attackedShipAtDOMArray = document.querySelectorAll (`.${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
+            console.log(attackedShipAtDOMArray);
 
             // ! Hit the ship
             attackedShipInFormation.hit(attackedFieldInGameboard.Section); // ? Hit the attacked ship
@@ -462,6 +463,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
 
             // ! If whole formation is erased
             for(let x = 0; x < shipFormation.length; x++){
+                formationCounter = shipFormation.length;
                 if(shipFormation[x].sunkenState() === true){ // ? Return if all ships in formation are sunken
                     formationCounter--;
                     if(formationCounter === 0){
@@ -674,7 +676,7 @@ MainGameLoop = (playerName) => {
     // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
 
     // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
-    interVal = 2000;
+    interVal = 100;
     cpuAttackInterval =  setInterval(() => {
         if(info.actualOnTurn() === `cpu`) {
             CPU.cpuAttack();
