@@ -75,27 +75,17 @@ getRandomYCPUValues = (sizeY) => {
 randomShipPlacementValues = (shipType, sizeY, sizeX) => {
     if(typeof shipType !== 'string') throw new TypeError(`Argument shipType must be an 'string'`)
     shipLength = getShipLength(shipType);
-    console.log(`random ship Placement val: ${shipType}, ${shipLength} (length),  ${sizeY}, ${sizeX}`);
 
     // ? Random Destroyer placement
     direction =  getRandomDirection();
     if (direction === `horizontal`){ // ? --
         xValue =  getRandomXCPUValues(sizeX - shipLength - 1);
-        // if(xValue === 0 || typeof xValue !== 'number' || typeof xValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
-        console.log(`direction x val: `, direction, xValue);
         yValue = getRandomYCPUValues(sizeY);
-        // if(yValue === 0 || typeof yValue !== 'number' || typeof yValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
-
-        console.log({start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]});
         return {direction: direction, shipType: shipType, start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]};
     };
     if (direction === `vertical`){ // ? |
         xValue =  getRandomXCPUValues(sizeX);
-        // if(xValue === 0 || typeof xValue !== 'number' || typeof xValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
-        console.log(`direction x val: `, direction, xValue);
         yValue = getRandomYCPUValues(sizeY - shipLength - 1);
-        // if(yValue === 0 || typeof yValue !== 'number' || typeof yValue === undefined) {randomShipPlacementValues(shipType, sizeY, sizeX); return;};
-
         console.log({direction: direction, shipType: shipType, start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]});
         return {start: [yValue, xValue], end: [yValue + shipLength - 1, xValue]};
     };
@@ -107,16 +97,9 @@ proofFieldForFree = (coordinates, playerToProof) => {
         counter = coordinates.end[1] - coordinates.start[1];
         for(x = 0; x < counter; x++){
             val = coordinates.start[1] + x;
-            console.log(`Validation:`);
-            console.log(coordinates.start[0], val);
-            fielID = calculateFieldID(coordinates.start[0], val);
-            console.log(`FielID: ${fieldID}`);
+            fieldID = calculateFieldID(coordinates.start[0], val);
             valDOMElement = document.querySelector(`.${playerToProof.name}${fieldID}`);
-            console.log(`val DOM Element:`);
-            console.log(valDOMElement);
             valAtt = valDOMElement.getAttribute(`data-occupied`);
-            console.log(`Occupied`);
-            console.log(valAtt);
             if(valAtt === `true` || valAtt === `true`){
                return false;
                };
@@ -128,16 +111,10 @@ proofFieldForFree = (coordinates, playerToProof) => {
         counter = coordinates.end[0] - coordinates.start[0]; // ? Difference is the number of fields
         for(x = 0; x < counter; x++){
             val = coordinates.start[0] + x;
-            console.log(`Validation:`);
-            console.log(val, coordinates.start[1]);
             fieldID = calculateFieldID(val, coordinates.start[1]);
-            console.log(`FielID: ${fieldID}`);
             valDOMElement = document.querySelector(`.${playerToProof.name}${fieldID}`);
-            console.log(`val DOM Element:`);
-            console.log(valDOMElement);
             valAtt = valDOMElement.getAttribute(`data-occupied`);
-            console.log(`Occupied`);
-            console.log(valAtt);
+
             if(valAtt === `true` || valAtt === `true`){
                return false;
                };
@@ -312,7 +289,6 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
     this.shipIDCounter = shipIDCounter; // ? Object to count the ID up to get unique ships IDs
     this.formationCounter = formationCounter; // ?`Object to count the number of ships in the formation of the player
 
-    if(typeof player === 'object'){player = player.name; position= player.position} // ? Destructure player object if human is false to get name and position of the cpu 
     shipIDCounter = 0; // ? Unique ship ID
     shipFormation = []; // ? Stores all ships
     formationCounter = 0;  // ? Gameboards should be able to report whether or not all of their ships have been sunk.
@@ -343,7 +319,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             field.setAttribute(`data-playerFieldID`, player+fieldID);
             field.setAttribute(`data-occupied`, `false`);
             field.classList.add(player);
-            field.classList.add(player+ fieldID);
+            field.classList.add( `${player}${fieldID}`);
+
             field.innerText = fieldID;
 
             field.addEventListener('click', () => {
@@ -358,17 +335,12 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         gameboard.push(row); // ? Push the row array within the fieldIDs to the gameboard array 
     };
 
-
     placement = (type, start, end) => {
-
         // ? Argument validation
         if(typeof type !== 'string') throw new TypeError('Only the strings "Destroyer", "Submarine", "Cruiser", "Battleship"or "Carrier"are allowed as ship type.')
         if(Array.isArray(start) === false || Array.isArray(end) === false) throw new TypeError(`Only 'arrays' are allowed as start & end arguments.`);
         if(start.length + end.length !== 4) throw new Error('In each placement array 2 values are allowed: The x and the y coordinate values.');
 
-        console.log(`start/end`);
-        console.log(start);
-        console.log(end);
         //  ? Create new ship for placement
         switch (type) {
             case 'Destroyer':
@@ -390,7 +362,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                     throw new Error(`Only the strings "Destroyer", "Submarine", "Cruiser", "Battleship"or "Carrier"are allowed as ship type.`);
         };
         // ? Finalize ship 
-        newShip.ID = shipIDCounter;
+        newShip.ID = `ID${shipIDCounter}`;
         newShip.Owner = this.player;
         shipFormation.push(newShip);
         formationCounter++;
@@ -414,7 +386,6 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                     row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
                     
                     fieldIDPlacement = calculateFieldID(start[0], y +1);
-                   console.log(`FieldID${fieldIDPlacement}`);
                     // ? With the field id place the ship in the corresponend DOM-Element 
                     fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
@@ -433,7 +404,6 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                 row = gameboard[x];  // ? Get the correct row in this loop round
 
                 fieldIDPlacement =  calculateFieldID(x +1 , start[1]);   // ? Get fieldID 
-                console.log(`FieldID${fieldIDPlacement}`);
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
@@ -453,10 +423,8 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
 
         // ? Inform invoker of placement
         if  (correctPlacement === true) {
-            // console.log(`Plaement of ${type} fullfilled: ${correctPlacement}.`); 
             return  `Placement of ${type} fullfilled: ${correctPlacement}. Coordinates: Start X${start[0]}/Y${start[1]}, End X${end[0]}/Y${end[1]}`;
         } else {
-            // console.log(`Plaement of ${type} fullfilled: ${correctPlacement}. Coordinates for placement not accurate.`);
             return `Placement of ${type} fullfilled: ${correctPlacement}. Coordinates for placement not accurate.`; 
         };
     };
@@ -470,31 +438,29 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         
         gameboard_row = gameboard[y-1]; // ? Get the gameboard row of the attacked cell
         attackedFieldInGameboard = gameboard_row[x-1]; // ? Get the attacked cell in the gameboard
-        attackedShipID = gameboard_row[x - 1].ID; // ? Get the attacked ship ID
         fieldID = calculateFieldID(y, x); // ? Get attacked fieldID
         attackedFieldAtDOM = document.querySelector(`.${player}${fieldID}`); // ? Get the attacked field as DOM-Element
 
-        // ! Proof if the attack hitted a ship or not
+        // ! Attack a ship
         if(typeof attackedFieldInGameboard !== 'number') { // ? If the attacked cell is not a number, so a ship object is in,  its a hit..
-            gameboard_row[x -1].hitted = true; // ?  Set gameboard cell to hitted
-            // formationPosition = gameboard_row[x - 1].ID; // ? The ship ID is a unique increasing number, shipFormattion an array. If we want the ship with the the ID in the array, we must do shipFormation[ID - 1] 
-            attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
+            attackedShipID = gameboard_row[x - 1].ID; // ? Get the attacked ship ID
+            attackedShipInFormation = shipFormation[attackedShipID[3]]; // ? Get the attacked ship object in the shipFormation array
+            attackedShipAtDOMArray = document.getElementsByClassName (`${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
 
-            attackedShipAtDOMArray = document.getElementsByClassName (`${player}${attackedShipID}`); // ? Get the attacked ship as DOM-Elements
+            // ! Hit the ship
             attackedShipInFormation.hit(attackedFieldInGameboard.Section); // ? Hit the attacked ship
-
-            // ? Hitted DOM-Element
-            attackedFieldAtDOM.innerText = `x`;
+            attackedFieldInGameboard.hitted = true; // ?  Set gameboard cell to hitted
+            attackedFieldAtDOM.innerText = `x`; // todo
             attackedFieldAtDOM.setAttribute(`data-hitted`, true);
             player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`hitted-cpu`, `hitted`) : attackedFieldAtDOM.classList.add(`hitted-human`, `hitted`); // ? Depending on the name knowing if human or cpu add hitted classes
 
-            // ! Return from the function if  the whole formation is erased by the attack and inform player
+            // ! If whole formation is erased
             for(let x = 0; x < shipFormation.length; x++){
                 if(shipFormation[x].sunkenState() === true){ // ? Return if all ships in formation are sunken
                     formationCounter--;
                     if(formationCounter === 0){
                         alert(`Enemy formation is destroyed`);
-                        alive = false; // ! Needed ???
+                        alive = false; // todo Needed ???
 
                         for(x of attackedShipAtDOMArray){
                             x.classList.add(`sunken-ship`); // ! Maybe an animation ???
@@ -505,6 +471,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                     };
                 };
             };
+            // ! If ship is destroyed
             if(attackedShipInFormation.sunkenState() === true){
 
                 for(x of attackedShipAtDOMArray){
@@ -567,14 +534,7 @@ const GameInformation = function (playerName){
         onTurn === `player` ? onTurn = `cpu` : onTurn =  `player`; // ? Change who is on turn
     };
 
-    cpuFullName = () => {
-        switch (parseInt(localStorage.Level)) {
-            case 1:
-                return {position: `General`, name: `Battlesmith`};
-        };
-    };
-
-    return { playerName, actualOnTurn, newPlayer, playerCounter, nextRound, roundCounter, cpuFullName };
+    return { playerName, actualOnTurn, newPlayer, playerCounter, nextRound, roundCounter};
 };
 
 MainGameLoop = (playerName) => {
@@ -585,15 +545,13 @@ MainGameLoop = (playerName) => {
     document.body.appendChild(game_container);
   
     const info = new GameInformation(playerName); // ? Open new GameInformation object  
-    cpuFullName = info.cpuFullName(); // ? Get the name of the enemy cpu depending on the actual level 
-    cpuName = cpuFullName.name;
 
     //The game loop should set up a new game by creating Players and Gameboards. 
     const player_Gameboard = new Gameboard(10, 10, playerName, info);  
-    const cpu_Gameboard = new Gameboard(10, 10, cpuFullName, info); 
+    const cpu_Gameboard = new Gameboard(10, 10, `CPU`, info); 
   
     const TestPlayer = new Player('Test Player', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
-    const FirstComputer = new Player(cpuName, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
+    const FirstComputer = new Player(`CPU`, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
     player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
  
@@ -603,7 +561,6 @@ MainGameLoop = (playerName) => {
         // ? Argument validation
         if(typeof player !== 'string') throw new TypeError('Only strings are allowed as player arguments.');
         if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
-        console.log(`Random ${shipType} placement for ${player}`);
         
         if(shipType === `Destroyer`){
             coordinates = randomShipPlacementValues(`Destroyer`, cpu_Gameboard.sizeY, cpu_Gameboard.sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
@@ -611,14 +568,12 @@ MainGameLoop = (playerName) => {
                 randomPlacement(player, shipType);
                 return;
             };
-            console.log(`Coordinats ${coordinates}`);     
 
             freeField = proofFieldForFree(coordinates, FirstComputer);
             if(freeField === false) randomPlacement(player, shipType);
   
             if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            // console.log(`Random placement of ${shipType} succesfull`);
             return true;
         };
 
@@ -629,13 +584,11 @@ MainGameLoop = (playerName) => {
                 return;
             };
         
-            console.log(`Coordinats ${coordinates}`);
             freeField = proofFieldForFree(coordinates, FirstComputer);
             if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            // console.log(`Random placement of ${shipType} succesfull`);
             return true;
         };
 
@@ -646,13 +599,11 @@ MainGameLoop = (playerName) => {
                 return;
             };
             
-            console.log(`Coordinats ${coordinates}`);
             freeField = proofFieldForFree(coordinates, FirstComputer);
             if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            // console.log(`Random placement of ${shipType} succesfull`);
             return true;
         };
 
@@ -663,7 +614,6 @@ MainGameLoop = (playerName) => {
                 return;
             };
             
-            console.log(`Coordinats ${coordinates}`);
             freeField = proofFieldForFree(coordinates, FirstComputer);
             if(freeField === false) randomPlacement(player, shipType);
 
@@ -680,13 +630,11 @@ MainGameLoop = (playerName) => {
                 return;
             };
     
-            console.log(`Coordinats ${coordinates}`);
             freeField = proofFieldForFree(coordinates, FirstComputer);
             if(freeField === false) randomPlacement(player, shipType);
 
             if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
             if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            // console.log(`Random placement of ${shipType} succesfull`);
             return true;
         };
 
