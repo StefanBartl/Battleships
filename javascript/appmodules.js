@@ -48,7 +48,6 @@ calculateFieldID = (y, x) => {
 
 getRandomDirection = () => {
     // ? Randomize in which direction ship is placed. (  horizontal -- or vertical  |  )
-    // randomDirection = getRandomInt(2);
     if(getRandomInt(2) === 0){
          return `horizontal`       // ?   --
     } else return `vertical`;    // ? |
@@ -56,7 +55,7 @@ getRandomDirection = () => {
 
 getRandomXCPUValues = (sizeX) => {
     xValue = getRandomInt(sizeX + 1);
-    if(xValue === 0 || typeof xValue !== 'number' || typeof xValue === undefined) {
+    if(xValue === 0 || typeof xValue !== 'number' || xValue === undefined) {
         getRandomXCPUValues();
         return;
     };
@@ -65,7 +64,7 @@ getRandomXCPUValues = (sizeX) => {
 
 getRandomYCPUValues = (sizeY) => {
     yValue = getRandomInt(sizeY + 1);
-    if(yValue === 0 || typeof yValue !== 'number' | typeof yValue === undefined) {
+    if(yValue === 0 || typeof yValue !== 'number' || yValue === undefined) {
         getRandomYCPUValues();
         return;
     };
@@ -262,7 +261,7 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
     cpuAttack = () => {
         if(human === false){ // ? Only allow computer  player
             randomCoordinates = getValidRandomAttackCo(); // ? Get valid coordinates
-            if(typeof randomCoordinates[0] !== 'number' || typeof randomCoordinates[1] !== 'number' || typeof randomCoordinates === undefined){
+            if(randomCoordinates === undefined){
                 cpuAttack();
                 return;
             };
@@ -281,9 +280,9 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
 
     // ? Argument validation
     // if(typeof sizeX !== 'number' || typeof sizeY !== 'number') throw new TypeError(`Gameboard size arguments must be 'numbers'`);
-    // if(typeof player === undefined || typeof player === null) throw new TypeError(`Human players needs a 'string' argumnent, CPU-Players a Object with keys player & position.`)
+    // if( player === undefined || typeof player === null) throw new TypeError(`Human players needs a 'string' argumnent, CPU-Players a Object with keys player & position.`)
     // if(typeof info !== 'object') throw new TypeError(`The info argument must be GameInformation Object.`);
-    // if(typeof missedAttacks !== undefined || typeof shipIDCounter !== undefined || typeof shipFormation !== undefined || typeof formationCounter !== undefined) throw new TypeError(`Passing arguments for this parameter is not allowed`);
+    // if( missedAttacks !== undefined || shipIDCounter !== undefined || shipFormation !== undefined || formationCounter !== undefined) throw new TypeError(`Passing arguments for this parameter is not allowed`);
 
     this.sizeX = sizeX; // ? X-axis length
     this.sizeY = sizeY; // ? Y-axis length
@@ -398,8 +397,10 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                     fieldAtDOM.setAttribute(`data-occupied`, `true`);
                     fieldAtDOM.setAttribute(`data-type`, type);
                     fieldAtDOM.setAttribute(`data-section`, section);
+                    fieldAtDOM.setAttribute(`data-shipID`,` ${newShip.ID}`);
+
                     // ? Finalize ship placement in the gameboard array
-                    row[y] = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
+                    row[y] = {ID: newShip.ID, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                     section++; // ? Ship section is placed on the gameboard
                 };
                 correctPlacement = true; // ? If ship is correct placed on gameboard, placement is done
@@ -414,12 +415,14 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                 fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                 fieldAtDOM.innerText = `${type}${section}`;
                 fieldAtDOM.classList.add(`${player}${newShip.ID}`)
+                fieldAtDOM.classList.add(`${player}${type}`);
                 fieldAtDOM.setAttribute(`data-occupied`, `true`);
                 fieldAtDOM.setAttribute(`data-type`, type);
                 fieldAtDOM.setAttribute(`data-section`, section);
+                fieldAtDOM.setAttribute(`data-shipID`,`${newShip.ID}`);
 
                 // ? Finalize ship placement in the gameboard array
-                row[start[1] - 1]  = {ID: shipIDCounter, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
+                row[start[1] - 1]  = {ID: newShip.ID, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                 section++; // ? Ship section is placed on the gameboard
             };
             correctPlacement = true;  // ? If ship is correct placed on gameboard, placement is done
@@ -445,14 +448,21 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         attackedFieldInGameboard = gameboard_row[x-1]; // ? Get the attacked cell in the gameboard
         fieldID = calculateFieldID(y, x); // ? Get attacked fieldID
         attackedFieldAtDOM = document.querySelector(`.${player}${fieldID}`); // ? Get the attacked field as DOM-Element
-
+    
         // ! Attack a ship
         if(typeof attackedFieldInGameboard !== 'number') { // ? If the attacked cell is not a number, so a ship object is in,  its a hit..
-            attackedShipID = attackedFieldInGameboard.ID; // ? Get the attacked ship ID
+            attackedShipID = attackedFieldAtDOM.getAttribute(`data-shipID`); // ? Get the attacked ship ID
             attackedShipType = attackedFieldInGameboard.Type;
-            attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
+
+            for(x = 0; x < shipFormation.length; x++){ // ? Get attacked ship in the player formation
+                val =  shipFormation[x];
+                if(val.ID === attackedShipID)  attackedShipInFormation = val;
+            };
+
+            // attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
+
+
             attackedShipAtDOMArray = document.querySelectorAll (`.${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
-            console.log(attackedShipAtDOMArray);
 
             // ! Hit the ship
             attackedShipInFormation.hit(attackedFieldInGameboard.Section); // ? Hit the attacked ship
