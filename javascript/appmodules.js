@@ -86,7 +86,6 @@ randomShipPlacementValues = (shipType, sizeY, sizeX) => {
     if (direction === `vertical`){ // ? |
         xValue =  getRandomXCPUValues(sizeX);
         yValue = getRandomYCPUValues(sizeY - shipLength - 1);
-        console.log({direction: direction, shipType: shipType, start: [yValue, xValue], end: [yValue, xValue + shipLength - 1]});
         return {start: [yValue, xValue], end: [yValue + shipLength - 1, xValue]};
     };
 };
