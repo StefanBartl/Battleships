@@ -21,6 +21,7 @@ todo Argument validation in every function? With passed argument types?
 todo maybe gameboard ship type delete
 todo Human placement
 todo every class and attribute needed?
+todo Function cutting and proof if needed
 todo display images for human placements. Idea: for 3 fields ship cut a image in 3 pieces and than place it.
 todo display the names
 todo next level
