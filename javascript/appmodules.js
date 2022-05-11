@@ -262,7 +262,7 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
     cpuAttack = () => {
         if(human === false){ // ? Only allow computer  player
             randomCoordinates = getValidRandomAttackCo(); // ? Get valid coordinates
-            if(typeof randomCoordinates[0] !== 'number' || typeof randomCoordinates[1] !== 'number'){
+            if(typeof randomCoordinates[0] !== 'number' || typeof randomCoordinates[1] !== 'number' || typeof randomCoordinates === undefined){
                 cpuAttack();
                 return;
             };
