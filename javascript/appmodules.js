@@ -454,18 +454,11 @@ class Gameboard {
         // ! Attack a ship
         if(typeof attackedFieldInGameboard !== 'number') { // ? If the attacked cell is not a number, so a ship object is in,  its a hit..
             let attackedShipID = attackedFieldAtDOM.getAttribute(`data-shipID`); // ? Get the attacked ship ID
-            let attackedShipType = attackedFieldInGameboard.Type;
+            let attackedShipType = attackedFieldInGameboard.Type; // ! ? Use case ?
             let attackedShipInFormation;
-
-            console.log(`ship ID:`)
-            console.log(attackedShipID);
-            console.log(shipFormation);
 
             for(let x = 0; x < shipFormation.length; x++){ // ? Get attacked ship in the player formation
                 let val =  shipFormation[x];
-                console.log("val");
-                console.log(val);
-                console.log(val.ID);
                 if(val.ID === attackedShipID) {attackedShipInFormation = val; console.log(val.ID, attackedShipID, attackedShipInFormation, true);};
             };
 
@@ -479,17 +472,17 @@ class Gameboard {
             player.name !== typeof 'string' ? attackedFieldAtDOM.classList.add(`hitted-cpu`, `hitted`) : attackedFieldAtDOM.classList.add(`hitted-human`, `hitted`); // ? Depending on the name knowing if human or cpu add hitted classes
 
             // ! If whole formation is erased
+            formationCounter = shipFormation.length;
             for(let x = 0; x < shipFormation.length; x++){
-                formationCounter = shipFormation.length;
-                if(shipFormation[x].sunkenState() === true){ // ? Return if all ships in formation are sunken
+                if(shipFormation[x].sunkenState() === true){ // ? Proof if all ships in formation are sunken
                     formationCounter--;
                     if(formationCounter === 0){
                         alert(`Enemy formation is destroyed`);
-                        alive = false; // todo Needed ???
 
                         for(x of attackedShipAtDOMArray){
                             x.classList.add(`sunken-ship`); // ! Maybe an animation ???
                         };
+                        
                         // ! Here we must go to next level, congratulations, and so on... In the MainGameLoop we must proof of return to get know this
                         console.log(`Attack hitted & destroyed last ship!`);
                         return `Attack hitted & destroyed last shipt!`;
