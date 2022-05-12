@@ -37,6 +37,7 @@ todo storyline & level system
 
 
 MainGameLoop = (playerName) => {
+
   if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
 
   const game_container = document.createElement(`section`);
@@ -210,8 +211,10 @@ MainGameLoop = (playerName) => {
 
   };
 
-  // ? Invoke ship placement
-  placingRandomShipFormation(true);
+  // ? Invoke random ship placement: For human check first the dropdown list, for cpu invoke it definitely
+  if(document.querySelector(`.placement`).value === `No` ||
+        document.querySelector(`.placement`).value === `Nein`)
+        placingRandomShipFormation(true);
   placingRandomShipFormation(false);
 
   // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
@@ -223,14 +226,6 @@ MainGameLoop = (playerName) => {
       };
   }, interVal);
   // clearInterval(cpuAttackInterval); // ? To clear the interval f.e. after the game end
-
-  // TestPlayer.humanAttack(1, 3);
-  // FirstComputer.cpuAttack();
-  // TestPlayer.humanAttack(3, 1);
-
-  // ! You can implement a system for allowing players to place their ships later.
-// cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
-// player_Gameboard.enemyGameboardAdd(cpu_Gameboard);
 };
 
 startGame_btn.addEventListener(`click`, () => {
