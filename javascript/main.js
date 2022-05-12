@@ -16,26 +16,222 @@ todo                 Javascript - what a wonderful language!
 
 //#region Open Jobs  
 /*
-todo Validation for occupied fields
 todo Argument validation in every function? With passed argument types?
-todo maybe gameboard ship type delete
-todo Human placement
+todo Human placement function
+todo cpu placement thinking? dont allow placement as long as the cpu didnt placed (or make the cpu placement instantly....)
+todo display images for human placements. Idea: for 3 fields ship cut a image in 3 pieces and than place it.
+todo display the name(s)
+todo get informations by attacked and sunken ships by hovering 
+todo Animations for attacking, hitted or sunken ships 
+todo correct height and width of the gameboards
+todo text check
+todo UI styling
 todo every class and attribute needed?
 todo Function cutting and proof if needed
-todo display images for human placements. Idea: for 3 fields ship cut a image in 3 pieces and than place it.
-todo display the names
-todo next level
-todo storyline
-todo get informations by attacked and sunken ships by hovering 
-todo correct height and width of the gameboards
-todo Animations for attacking, hitted or sunken ships 
-todo dont allow placement as long as the cpu didnt placed (or make the cpu placement instantly....)
+todo CSS Minimizing and structuring
+todo commenting and file structure, also images removing if not needed
 todo LAST THING: Dont display the enemy gameboard :-) 
+todo storyline & level system
 */
 //#endregion
 
 
-//#region Start-Page Event-Listener
+MainGameLoop = (playerName) => {
+  if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
+
+  const game_container = document.createElement(`section`);
+  game_container.classList.add(`game-container`);
+  document.body.appendChild(game_container);
+
+  const info = new GameInformation(playerName); // ? Open new GameInformation object  
+
+  //The game loop should set up a new game by creating Players and Gameboards. 
+  const player_Gameboard = new Gameboard(10, 10, playerName, info);  
+  const cpu_Gameboard = new Gameboard(10, 10, `CPU`, info); 
+
+  const Human = new Player(playerName, true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
+  const CPU = new Player(`CPU`, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
+
+  player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
+
+  // ! placingRandomShipFormation() needs existing gameboards and players. It expliciy have to live here in the code!
+  placingRandomShipFormation = () => {     
+  
+  randomPlacement = (player, gameboard, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
+  // ? Argument validation
+  if(typeof player !== 'string') throw new TypeError('Only strings are allowed as player arguments.');
+  if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
+  
+  this.player = player;
+  this.shipType = shipType;
+  this.gameboard = gameboard;
+  sizeY = gameboard.sizeY;
+  sizeX = gameboard.sizeX;
+  
+  if(shipType === `Destroyer`){
+      coordinates = randomShipPlacementValues(`Destroyer`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+      if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+          return false;
+      };
+
+      freeField = proofFieldForFree(coordinates, CPU);
+      if(freeField === false){
+          return false;
+      };
+
+      if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
+
+      if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      console.log(`Placed ${shipType}`);
+      return true;
+  };
+
+  if(shipType === `Submarine`){
+      coordinates = randomShipPlacementValues(`Submarine`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+      if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+          return false;
+      };
+  
+      freeField = proofFieldForFree(coordinates, CPU);
+      if(freeField === false){
+          return false;
+      };
+
+      if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
+
+      if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      console.log(`Placed ${shipType}`);
+      return true;
+  };
+
+  if(shipType === `Cruiser`){
+      coordinates = randomShipPlacementValues(`Cruiser`,  sizeY, sizeX); 
+      if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+          return false;
+      };
+      
+      freeField = proofFieldForFree(coordinates, CPU);
+      if(freeField === false){
+          return false;
+      };
+
+      if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
+
+      if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      console.log(`Placed ${shipType}`);
+
+      return true;
+  };
+
+  if(shipType === `Battleship`){
+      coordinates = randomShipPlacementValues(`Battleship`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+      if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+          return false;
+      };
+      
+      freeField = proofFieldForFree(coordinates, CPU);
+      if(freeField === false){
+          return false;
+      };
+
+      if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
+
+      if(player === `human`)  player_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      if(player === `cpu`)  cpu_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      console.log(`Placed ${shipType}`);
+      return true;
+  };
+
+  if(shipType === `Carrier`){
+      coordinates = randomShipPlacementValues(`Carrier`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+      if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+          return false;
+      };
+
+      freeField = proofFieldForFree(coordinates, CPU);
+      if(freeField === false){
+          return false;
+      };
+
+      if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
+
+      if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+      console.log(`Placed ${shipType}`);
+      return true;
+  };
+
+  throw new Error(`Only the strings 'Destroyer', 'Submarine', 'Cruiser', 'Battleship' or 'Carrier' are allowed as ship type.`) // ? If nothing returned before there must be a problem with the shipType string
+  };
+
+  destroyer = () =>{
+      val = randomPlacement(`cpu`, cpu_Gameboard,  `Destroyer`);
+      if(val !== true) {
+          destroyer();
+      };
+  }; 
+
+  submarine = () =>{
+      sub = randomPlacement(`cpu`, cpu_Gameboard,  `Submarine`);
+      if(sub !== true) {
+          submarine();
+      };
+  };
+
+  cruiser = () => {
+      val = randomPlacement(`cpu`, cpu_Gameboard, `Cruiser`);
+      if(val !== true) {
+          cruiser();
+      };
+  };
+
+  battleship = () => {
+      val = randomPlacement(`cpu`, cpu_Gameboard, `Battleship`);
+      if(val !== true) {
+          battleship();
+      };
+  };
+
+  carrier = () => {
+      val = randomPlacement(`cpu`, cpu_Gameboard, `Carrier`);
+      if(val !== true)  {
+          carrier();
+      };
+  };
+
+  destroyer();
+  submarine();
+  cruiser();
+  battleship();
+  carrier();
+
+  return {destroyer, submarine, cruiser, battleship, carrier};
+
+  };
+  // ? Invoke ship placement for cpu
+  placingRandomShipFormation();
+
+  // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
+  interVal = 100;
+  cpuAttackInterval =  setInterval(() => {
+      if(info.actualOnTurn() === `cpu`) {
+          CPU.cpuAttack();
+          info.nextRound(); // ? Trigger next round from a cpu attack
+      };
+  }, interVal);
+  // clearInterval(cpuAttackInterval); // ? To clear the interval f.e. after the game end
+
+  // TestPlayer.humanAttack(1, 3);
+  // FirstComputer.cpuAttack();
+  // TestPlayer.humanAttack(3, 1);
+
+  // ! You can implement a system for allowing players to place their ships later.
+// cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
+// player_Gameboard.enemyGameboardAdd(cpu_Gameboard);
+};
 
 startGame_btn.addEventListener(`click`, () => {
   // ? Name Validation and storing
@@ -61,49 +257,3 @@ myLogo.addEventListener(`click`, () => {
 githubLogo.addEventListener(`click`, () => { 
   openInNewTab(`https://github.com/StefanBartl/Battleships`);
 });
-
-
-//#endregion
-
-
-//#region Factories
-
-//#region Ship factory
-// const Battleship= require('../src/app-modules/ship');
-// const MS_BattleshipBrowser = new Battleship(2); // ? Create a new ship. The type depends on the length.
-// MS_BattleshipBrowser.hit(1); // ? Hit a ship (Returns a error if the argument isn't in the range of ship length)
-// console.log(MS_BattleshipBrowser.type); // ? Returns the ship type
-// console.log(MS_BattleshipBrowser.sunkenState()); // ? Returns if the ship is sunken
-//#endregion
-
-
-//#region  Gameboard factory
-//const Gameboard = require('./app-modules/gameboard');
-// const Gameboard_One = new Gameboard(10,6, 'Test player'); // ? Creates a new Gameboard with 10 rows / 6 columns for the player 'Test player'
-// Gameboard_One.placement("battleship", [3, 1], [5, 1]);  // ? Placing a battleship on the gameboard in the 1 column from row 3 to 5
-// Gameboard_One.receiveAttack(3,1); // ? Attack the gameboard
-// console.log(Gameboard_One.shipFormation[0].sectionsState()); // ? Returns the ship sections
-// console.log(Gameboard_One.receiveAttack(1,3)); // ? Returns if the attack hits a ship (maybe which section?   )
-// console.log(Gameboard_One.alive()); // ? Returns if ships are on the gameboard
-//#endregion
-
-
-//#region Player factory
-//const Player = require('../src/app-modules/player');
-// const Gameboard_FirstComputer = new Gameboard(10,6, 'First Computer'); // ? Creates a new Gameboard with 10 rows / 6 columns for the player 'Test player'
-// const Gameboard_TestPlayer = new Gameboard(10,6, 'Test Player');
-// Gameboard_FirstComputer.enemyGameboardAdd(Gameboard_TestPlayer);
-// Gameboard_TestPlayer.enemyGameboardAdd(Gameboard_FirstComputer);
-
-// const FirstComputer = new Player('First Computer', false, Gameboard_FirstComputer, Gameboard_TestPlayer, Gameplay); // ? Create Player
-// Gameboard_FirstComputer.placement("battleship", [1, 1], [3, 1]);  // ? Placing a battleship on the gameboard in the 1 column from row 3 to 5
-
-// const TestPlayer = new Player('Test Player', true, Gameboard_TestPlayer, Gameboard_FirstComputer, Gameplay); 
-// Gameboard_TestPlayer.placement("battleship", [3, 1], [5, 1]); 
-
-// TestPlayer.humanAttack(2, 1);
-// FirstComputer.cpuAttack();
-
-//#endregion
-
-//#endregion

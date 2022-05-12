@@ -1,3 +1,5 @@
+//#region Functions
+
 getRandomInt = (max) =>{
     return Math.floor(Math.random() * max);
 };
@@ -91,8 +93,8 @@ randomShipPlacementValues = (shipType, sizeY, sizeX) => {
 
 proofFieldForFree = (coordinates, playerToProof) => {
 
-    if(coordinates.start[0] === coordinates.end[0]){// ? Difference is the number of fields
-        counter = coordinates.end[1] - coordinates.start[1];
+    if(coordinates.start[0] === coordinates.end[0]){
+        counter = coordinates.end[1] - coordinates.start[1] + 1; // ? Difference +1 is the number of fields
         for(x = 0; x < counter; x++){
             val = coordinates.start[1] + x;
             fieldID = calculateFieldID(coordinates.start[0], val);
@@ -106,7 +108,7 @@ proofFieldForFree = (coordinates, playerToProof) => {
     };
     
     if(coordinates.start[1] === coordinates.end[1]){
-        counter = coordinates.end[0] - coordinates.start[0]; // ? Difference is the number of fields
+        counter = coordinates.end[0] - coordinates.start[0] + 1;
         for(x = 0; x < counter; x++){
             val = coordinates.start[0] + x;
             fieldID = calculateFieldID(val, coordinates.start[1]);
@@ -120,6 +122,11 @@ proofFieldForFree = (coordinates, playerToProof) => {
         return true
         };
 };
+
+//#endregion
+
+
+//#region Classes
 
 class Ship {
     // Ships will be objects that include their length, where they’ve been hit and whether or not they’ve been sunk
@@ -377,15 +384,15 @@ class Gameboard {
             if(start[0] - end[0] !== -(newShip.length -1) && start[0] - end[0] !== (newShip.length -1)) throw new Error(`Placement coordinates do not correspond with ship length. For ${newShip.type} the coordinates only can differ ${newShip.length} fields.`)
         };
 
-         //  ? Make the placement in gameboard array
+         // ! Make  placement
         let correctPlacement = false; 
         let section = 1;   
          if(start[0] === end[0]){ // ? Get the placement direction, here like --
                 for(let y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
                     let row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
-                    
+
+                    // ? Make placement in DOM
                     let fieldIDPlacement = calculateFieldID(start[0], y +1);
-                    // ? With the field id place the ship in the corresponend DOM-Element 
                     let fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
                     fieldAtDOM.classList.add(`${player}${newShip.ID}`)
@@ -402,12 +409,9 @@ class Gameboard {
                 correctPlacement = true; // ? If ship is correct placed on gameboard, placement is done
         };         
         if(start[1] === end[1]){ // ? Get placement direction, here |
-            for(let x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
-                let row = gameboard[x];  // ? Get the correct row in this loop round
-
-                let fieldIDPlacement =  calculateFieldID(x +1 , start[1]);   // ? Get fieldID 
-
-                // ? With the field id place the ship in the corresponend DOM-Element 
+            for(let x = start[0] - 1; x <= end[0] - 1; x++){ 
+                let row = gameboard[x];
+                let fieldIDPlacement =  calculateFieldID(x +1 , start[1]);
                 let fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                 fieldAtDOM.innerText = `${type}${section}`;
                 fieldAtDOM.classList.add(`${player}${newShip.ID}`)
@@ -416,15 +420,8 @@ class Gameboard {
                 fieldAtDOM.setAttribute(`data-type`, type);
                 fieldAtDOM.setAttribute(`data-section`, section);
                 fieldAtDOM.setAttribute(`data-shipID`,`${newShip.ID}`);
-
-                // ? Finalize ship placement in the gameboard array
-                row[start[1] - 1]  = {ID: newShip.ID, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
-                section++; // ? Ship section is placed on the gameboard
-            };
-
-            if(player === `cpu`){
-                console.log(`Ship:`);
-                if(gameboard.length === 4)console.log(gameboard);
+                row[start[1] - 1]  = {ID: newShip.ID, Type: type, Section: section};
+                section++;
             };
 
             correctPlacement = true;  // ? If ship is correct placed on gameboard, placement is done
@@ -482,7 +479,7 @@ class Gameboard {
                         for(x of attackedShipAtDOMArray){
                             x.classList.add(`sunken-ship`); // ! Maybe an animation ???
                         };
-                        
+
                         // ! Here we must go to next level, congratulations, and so on... In the MainGameLoop we must proof of return to get know this
                         console.log(`Attack hitted & destroyed last ship!`);
                         return `Attack hitted & destroyed last shipt!`;
@@ -556,151 +553,4 @@ class GameInformation {
     };
 };
 
-MainGameLoop = (playerName) => {
-    if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
-
-    const game_container = document.createElement(`section`);
-    game_container.classList.add(`game-container`);
-    document.body.appendChild(game_container);
-  
-    const info = new GameInformation(playerName); // ? Open new GameInformation object  
-
-    //The game loop should set up a new game by creating Players and Gameboards. 
-    const player_Gameboard = new Gameboard(10, 10, playerName, info);  
-    const cpu_Gameboard = new Gameboard(10, 10, `CPU`, info); 
-  
-    const Human = new Player('Human', true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
-    const CPU = new Player(`CPU`, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
-
-    player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
- 
-
-    
-    randomPlacement = (player, gameboard, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
-        // ? Argument validation
-        if(typeof player !== 'string') throw new TypeError('Only strings are allowed as player arguments.');
-        if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
-        
-        this.player = player;
-        this.shipType = shipType;
-        this.gameboard = gameboard;
-        sizeY = gameboard.sizeY;
-        sizeX = gameboard.sizeX;
-        
-        if(shipType === `Destroyer`){
-            coordinates = randomShipPlacementValues(`Destroyer`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, gameboard, shipType);
-                return;
-            };
-
-            freeField = proofFieldForFree(coordinates, CPU);
-            if(freeField === false) randomPlacement(player, gameboard, shipType);
-  
-            if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            return true;
-        };
-
-        if(shipType === `Submarine`){
-            coordinates = randomShipPlacementValues(`Submarine`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, gameboard, shipType);
-                return;
-            };
-        
-            freeField = proofFieldForFree(coordinates, CPU);
-            if(freeField === false) randomPlacement(player, gameboard, shipType);
-
-            if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            return true;
-        };
-
-        if(shipType === `Cruiser`){
-            coordinates = randomShipPlacementValues(`Cruiser`,  sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, gameboard, shipType);
-                return;
-            };
-            
-            freeField = proofFieldForFree(coordinates, CPU);
-            if(freeField === false) randomPlacement(player, gameboard, shipType);
-
-            if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            return true;
-        };
-
-        if(shipType === `Battleship`){
-            coordinates = randomShipPlacementValues(`Battleship`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, gameboard, shipType);
-                return;
-            };
-            
-            freeField = proofFieldForFree(coordinates, CPU);
-            if(freeField === false) randomPlacement(player, gameboard, shipType);
-
-            if(player === `human`)  player_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            if(player === `cpu`)  cpu_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            // console.log(`Random placement of ${shipType} succesfull`);
-            return true;
-        };
-
-        if(shipType === `Carrier`){
-            coordinates = randomShipPlacementValues(`Carrier`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-            if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-                randomPlacement(player, gameboard, shipType);
-                return;
-            };
-    
-            freeField = proofFieldForFree(coordinates, CPU);
-            if(freeField === false) randomPlacement(player, gameboard, shipType);
-
-            if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-            return true;
-        };
-
-        throw new Error(`Only the strings 'Destroyer', 'Submarine', 'Cruiser', 'Battleship' or 'Carrier' are allowed as ship type.`) // ? If nothing returned before there must be a problem with the shipType string
-
-    };
-
-    des = randomPlacement(`cpu`, cpu_Gameboard,  `Destroyer`);
-    if(des !== true) randomPlacement(`cpu`, cpu_Gameboard, `Destroyer`);
-
-    sub = randomPlacement(`cpu`, cpu_Gameboard,  `Submarine`);
-    if(sub !== true) randomPlacement(`cpu`, cpu_Gameboard, `Submarine`);
-    
-    cru = randomPlacement(`cpu`, cpu_Gameboard, `Cruiser`);
-    if(cru !== true) randomPlacement(`cpu`, cpu_Gameboard, `Cruiser`);
-
-    bat = randomPlacement(`cpu`, cpu_Gameboard, `Battleship`);
-    if(bat !== true) randomPlacement(`cpu`, cpu_Gameboard, `Battleship`);
-    
-    car = randomPlacement(`cpu`, cpu_Gameboard, `Carrier`);
-    if(car !== true)  randomPlacement(`cpu`, cpu_Gameboard, `Carrier`);
-    
-
-    
-    // alert(`Player, you are on turn! Select a field in the enemy Gameboard to attack.`); DEUTSCH
-
-    // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
-    interVal = 100;
-    cpuAttackInterval =  setInterval(() => {
-        if(info.actualOnTurn() === `cpu`) {
-            CPU.cpuAttack();
-            info.nextRound(); // ? Trigger next round from a cpu attack
-        };
-    }, interVal);
-    // clearInterval(cpuAttackInterval); // ? To clear the interval f.e. after the game end
-
-    // TestPlayer.humanAttack(1, 3);
-    // FirstComputer.cpuAttack();
-    // TestPlayer.humanAttack(3, 1);
-
-    // ! You can implement a system for allowing players to place their ships later.
-// cpu_Gameboard.enemyGameboardAdd(player_Gameboard);
-// player_Gameboard.enemyGameboardAdd(cpu_Gameboard);
-};
+//#endregion
