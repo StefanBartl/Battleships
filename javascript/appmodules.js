@@ -121,20 +121,21 @@ proofFieldForFree = (coordinates, playerToProof) => {
         };
 };
 
-const Ship = function (length) {
+class Ship {
     // Ships will be objects that include their length, where they’ve been hit and whether or not they’ve been sunk
-    
+    constructor(length){
       if(length < 1 || length === undefined) throw new Error("Ship must have a length between 2 and 5.");
       this.length = length;
+      let health = length;
   
       // Setup the ship sections depending on ther length
-      sections = {};
+      let sections = {};
       for(let x = 1; x <= length; x++){
           sections[x] = "ok";
       };
   
       // Assign type to ship depening on its length
-      type = '';
+      let type = '';
       switch (length) {
         case 2:
             type = 'Destroyer';
@@ -154,8 +155,8 @@ const Ship = function (length) {
     };
   
       // Returns the actual states of the sections
-      sectionsState = () => {
-        actual_ship_state = {};
+      const sectionsState = () => {
+        let actual_ship_state = {};
         for(let x = 1; x <= length; x++){
             actual_ship_state[`Section`+x] = sections[x];
         };
@@ -163,8 +164,8 @@ const Ship = function (length) {
       };
   
       // Returns the actual number of damaged sections
-      damage = () => {
-        damagedSections = 0;
+      const damage = () => {
+        let damagedSections = 0;
         for(let x = 1; x <= length; x++){
             if(sections[x] === "hitted") damagedSections++;
         };
@@ -172,12 +173,12 @@ const Ship = function (length) {
       };
   
        // Returns the health points
-      health = () => {
+       const healthStatus = () => { // ! ? Needed
        return length - damage();
       };
   
       // sunkenState should be a function that calculates it based on their length and whether all of their positions are ‘hit’. The result can be returned as boolean or as a string
-      sunkenState = (asString)=>{
+      const sunkenState = (asString)=>{
           if(damage() === length){
               if(asString === true) {return `This ship is sunken.`}
               else return true;
@@ -186,7 +187,7 @@ const Ship = function (length) {
       };
     
       // Ships should have a hit() function that takes a number and then marks that position as ‘hit’
-       hit =  (section)=>{
+      const hit =  (section)=>{
          // Check for correct argument
           if(typeof section !== 'number' || section < 1 || section > length) throw new Error(`Only a 'number' between 1 an ${length} (ship length) is allowed.`);
           sections[section] = "hitted";   // console.log(`Section ${section} status: ${sections[section]}`);
@@ -194,12 +195,14 @@ const Ship = function (length) {
           return `Ship hitted at section ${section}`;
       };
   
-     return { length, type, health, damage, sectionsState, sunkenState, hit};
+     return { length, type, health, healthStatus, damage, sectionsState, sunkenState, hit};
+    };
 };
 
-const Player = function (name, human, ownGameboard, enemyGameboard, info){
-
+class Player {
+    constructor(name, human, ownGameboard, enemyGameboard, info){
     this.name = name;
+    this.human = human;
     this.ownGameboard = ownGameboard;
     this.enemyGameboard = enemyGameboard;
     this.info = info;
@@ -214,33 +217,31 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
             };  
 
     // ! Players can take turns playing the game by attacking the enemy Gameboard.
-    humanAttack = (y, x) => {
+    const humanAttack = (y, x) => {
         // Argument validation
         if(typeof y !== 'number' || typeof x !== 'number') throw new TypeError(`Only 'numbers' are allowed as arguments.`);
         if(y >= enemyGameboard.sizeY || x >= enemyGameboard.sizeX) throw new RangeError(`For argument y max ${enemyGameboard.sizeY - 1} and for argument x max ${enemyGameboard.sizeX - 1} are allowed.`)
         
         if(human === true){ // ? Check for human player
-            row = enemyGameboard.gameboard[y - 1];
-            fieldNumber = row[x - 1];
+            let row = enemyGameboard.gameboard[y - 1], fieldNumber = row[x - 1];
             if(enemyGameboard.missedAttacks.indexOf(fieldNumber) !== -1) throw new Error(`This field was attacked before`); // ? Check if the field was attacked before by checking the field number in the enemy missedAttacks array
-            result = enemyGameboard.receiveAttack(y, x); // ? Attack the enemy gameboard
+            let result = enemyGameboard.receiveAttack(y, x); // ? Attack the enemy gameboard
             return result 
         } else throw new Error(`Computer Player must use cpuAttack()`);
     };
 
-    //#region Section exclusive for Computer Players 
     // ! The game is played against the computer, so make ‘computer’ players capable of making random plays. 
 
-    getRandomAttackCo = () => {
-        rand = getRandomInt(enemyGameboard.sizeY * enemyGameboard.sizeX) + 1 ; // ? Get a random integer between 0 and the maximum field amount of the gameboard. +1 because the argument number itself can not be returned by getRandomInt()
+    const getRandomAttackCo = () => {
+        let rand = getRandomInt(enemyGameboard.sizeY * enemyGameboard.sizeX) + 1 ; // ? Get a random integer between 0 and the maximum field amount of the gameboard. +1 because the argument number itself can not be returned by getRandomInt()
         if(rand === 0){ // ? Restart if rand is 0
             return false;
         };
-        for (row = 0; row < enemyGameboard.sizeY; row++){   // ? Loop trough the rows 
+        for (let row = 0; row < enemyGameboard.sizeY; row++){   // ? Loop trough the rows 
             if(enemyGameboard.gameboard[row].indexOf(rand) !== -1){ // ? Get the field via matching the random number with the field number in the row
-                grow = enemyGameboard.gameboard[row];
-                fieldNumber = grow[enemyGameboard.gameboard[row].indexOf(rand)];
-                coordinates = [row, enemyGameboard.gameboard[row].indexOf(rand)]; // ? Get the coordinates of the field via the loop paramters from before
+                let eGrow = enemyGameboard.gameboard[row];
+                let fieldNumber = eGrow[enemyGameboard.gameboard[row].indexOf(rand)];
+                let coordinates = [row, enemyGameboard.gameboard[row].indexOf(rand)]; // ? Get the coordinates of the field via the loop paramters from before
                 if(enemyGameboard.missedAttacks.indexOf(rand) === -1){ // ? Check if the random field was not attacked before
                     return coordinates; // ? Return the coordinates if everything is ok
                 }   else return false;  // ? Else return false
@@ -248,8 +249,8 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
         };
     };
 
-    getValidRandomAttackCo = () => {
-        validCoordinates = getRandomAttackCo(); // ? Invoke getRandomAttackCo() to either get coordinates or false
+    const getValidRandomAttackCo = () => {
+        let validCoordinates = getRandomAttackCo(); // ? Invoke getRandomAttackCo() to either get coordinates or false
         if(validCoordinates === false || validCoordinates ===  undefined){
             getRandomAttackCo();
             return; // ? If no valid coordinates are returned, invoke it again
@@ -258,26 +259,24 @@ const Player = function (name, human, ownGameboard, enemyGameboard, info){
     };
 
     // ! The AI does not have to be smart, but it should know whether or not a given move is legal. (i.e. it shouldn’t shoot the same coordinate twice).
-    cpuAttack = () => {
+    const cpuAttack = () => {
         if(human === false){ // ? Only allow computer  player
-            randomCoordinates = getValidRandomAttackCo(); // ? Get valid coordinates
+            let randomCoordinates = getValidRandomAttackCo(); // ? Get valid coordinates
             if(randomCoordinates === undefined){
                 cpuAttack();
                 return;
             };
-            result = enemyGameboard.receiveAttack(randomCoordinates[0] + 1, randomCoordinates[1] + 1); // ? Attack the enemy gameboard
+            let result = enemyGameboard.receiveAttack(randomCoordinates[0] + 1, randomCoordinates[1] + 1); // ? Attack the enemy gameboard
             return result
         } else throw new Error(`Humans must use humanAttack()`);
     };
 
-    //#endregion
-
     return { name, human, ownGameboard, enemyGameboard, humanAttack, cpuAttack };
-
+    };
 };
 
-const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCounter, shipFormation, formationCounter){
-
+class Gameboard {
+    constructor (sizeX, sizeY, player, info){
     // ? Argument validation
     // if(typeof sizeX !== 'number' || typeof sizeY !== 'number') throw new TypeError(`Gameboard size arguments must be 'numbers'`);
     // if( player === undefined || typeof player === null) throw new TypeError(`Human players needs a 'string' argumnent, CPU-Players a Object with keys player & position.`)
@@ -288,14 +287,10 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
     this.sizeY = sizeY; // ? Y-axis length
     this.player = player; // ? Owner of the Gameboard object if it is a human
     this.info = info; // ? Info object of the current game
-    this.missedAttacks = missedAttacks; // ? Object for the missed attacks 
-    this.shipIDCounter = shipIDCounter; // ? Object to count the ID up to get unique ships IDs
-    this.formationCounter = formationCounter; // ?`Object to count the number of ships in the formation of the player
-
-    shipIDCounter = 0; // ? Unique ship ID
-    shipFormation = []; // ? Stores all ships
-    formationCounter = 0;  // ? Gameboards should be able to report whether or not all of their ships have been sunk.
-    missedAttacks = [];  // ? Gameboards should keep track of missed attacks so they can display them properly.
+    let shipIDCounter = 0; // ? Unique ship ID
+    let shipFormation = []; // ? Stores all ships
+    let formationCounter = 0;  // ? Gameboards should be able to report whether or not all of their ships have been sunk.
+    let missedAttacks = [];  // ? Gameboards should keep track of missed attacks so they can display them properly.
 
     // ? Create gameboard container and append it to the game DOM-Section-Element
     const gameboard_container = document.createElement(`div`);
@@ -305,13 +300,13 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
     // ! Create new gameboard: 2 objects are created, the gameboard array to hold informations about ships, attacks etc... and the DOM-Elements to display it in the browser
     let gameboard = [];
     let fieldID = 0;
-    for(y = 1; y <= sizeY; y++){ // ? Row loop
+    for(let y = 1; y <= sizeY; y++){ // ? Row loop
         let row = []; // ? Create row array for the gameboard array
         const row_container = document.createElement(`div`);  // ? Create the row DOM-Element with properties & append it to players gameboard DOM container
         row_container.classList.add(`rows`);
         row_container.setAttribute(`data-rowNumber`, y);
         gameboard_container.appendChild(row_container);
-        for(x = 1; x <= sizeX; x++){ // ? Fields loop
+        for(let x = 1; x <= sizeX; x++){ // ? Fields loop
             fieldID++; // ? Increase the field ID
             row.push(fieldID); // ? Push the field to the row array in the gameboard array
             const field = document.createElement(`div`); // ? Create the field DOM-Element with properties and append it to the row DOM-Element
@@ -338,28 +333,29 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         gameboard.push(row); // ? Push the row array within the fieldIDs to the gameboard array 
     };
 
-    placement = (type, start, end) => {
+    const placement = (type, start, end) => {
         // ? Argument validation
         if(typeof type !== 'string') throw new TypeError('Only the strings "Destroyer", "Submarine", "Cruiser", "Battleship"or "Carrier"are allowed as ship type.')
         if(Array.isArray(start) === false || Array.isArray(end) === false) throw new TypeError(`Only 'arrays' are allowed as start & end arguments.`);
         if(start.length + end.length !== 4) throw new Error('In each placement array 2 values are allowed: The x and the y coordinate values.');
 
         //  ? Create new ship for placement
+        let newShip;
         switch (type) {
             case 'Destroyer':
-                newShip = Ship(2);
+                newShip = new Ship(2);
                 break;
             case 'Submarine':
-                newShip = Ship(3);
+                newShip = new Ship(3);
                 break;
             case 'Cruiser':
-                newShip = Ship(3);
+                newShip = new Ship(3);
                 break;
             case 'Battleship':
-                newShip = Ship(4);
+                newShip = new Ship(4);
                 break;
             case 'Carrier':
-                newShip = Ship(5);
+                newShip = new Ship(5);
                 break;
                 default:
                     throw new Error(`Only the strings "Destroyer", "Submarine", "Cruiser", "Battleship"or "Carrier"are allowed as ship type.`);
@@ -382,22 +378,22 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         };
 
          //  ? Make the placement in gameboard array
-        correctPlacement = false; 
-        section = 1;   
+        let correctPlacement = false; 
+        let section = 1;   
          if(start[0] === end[0]){ // ? Get the placement direction, here like --
-                for(y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
-                    row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
+                for(let y = start[1] - 1; y <= end[1] - 1; y++){ // ? Number of fields for -- placement is the difference between start[0] and end[0]
+                    let row = gameboard[start[0] - 1]; // ? Get correct row (which is the same for all fields in a -- direction placement)
                     
-                    fieldIDPlacement = calculateFieldID(start[0], y +1);
+                    let fieldIDPlacement = calculateFieldID(start[0], y +1);
                     // ? With the field id place the ship in the corresponend DOM-Element 
-                    fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
+                    let fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                     fieldAtDOM.innerText = `${type}${section}`;
                     fieldAtDOM.classList.add(`${player}${newShip.ID}`)
                     fieldAtDOM.classList.add(`${player}${type}`);
                     fieldAtDOM.setAttribute(`data-occupied`, `true`);
                     fieldAtDOM.setAttribute(`data-type`, type);
                     fieldAtDOM.setAttribute(`data-section`, section);
-                    fieldAtDOM.setAttribute(`data-shipID`,` ${newShip.ID}`);
+                    fieldAtDOM.setAttribute(`data-shipID`,`${newShip.ID}`);
 
                     // ? Finalize ship placement in the gameboard array
                     row[y] = {ID: newShip.ID, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
@@ -406,13 +402,13 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                 correctPlacement = true; // ? If ship is correct placed on gameboard, placement is done
         };         
         if(start[1] === end[1]){ // ? Get placement direction, here |
-            for(x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
-                row = gameboard[x];  // ? Get the correct row in this loop round
+            for(let x = start[0] - 1; x <= end[0] - 1; x++){ // ? Loop trough  rows
+                let row = gameboard[x];  // ? Get the correct row in this loop round
 
-                fieldIDPlacement =  calculateFieldID(x +1 , start[1]);   // ? Get fieldID 
+                let fieldIDPlacement =  calculateFieldID(x +1 , start[1]);   // ? Get fieldID 
 
                 // ? With the field id place the ship in the corresponend DOM-Element 
-                fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
+                let fieldAtDOM = document.querySelector(`.${player}${fieldIDPlacement}`);
                 fieldAtDOM.innerText = `${type}${section}`;
                 fieldAtDOM.classList.add(`${player}${newShip.ID}`)
                 fieldAtDOM.classList.add(`${player}${type}`);
@@ -425,6 +421,12 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
                 row[start[1] - 1]  = {ID: newShip.ID, Type: type, Section: section}; // ? Set ship informations at actual field of the placement 
                 section++; // ? Ship section is placed on the gameboard
             };
+
+            if(player === `cpu`){
+                console.log(`Ship:`);
+                if(gameboard.length === 4)console.log(gameboard);
+            };
+
             correctPlacement = true;  // ? If ship is correct placed on gameboard, placement is done
         };       
         shipIDCounter++; // ? Increase shipID counter so the next ship have a own ID
@@ -437,32 +439,37 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
         };
     };
 
-    receiveAttack = (y, x)=>{
+    const receiveAttack = (y, x)=>{
     // Gameboards should have a receiveAttack function that takes a pair of coordinates, determines whether or not the attack hit a ship and then sends the ‘hit’ function to the correct ship, or records the coordinates of the missed shot.
         // receiveAttack() needs normal indexed arguments!
         // Argument validation
         if(typeof x !== 'number' || typeof y !== 'number') throw new TypeError(`Only 'numbers' are allowed`);
         if(x > sizeX || y > sizeY || x < 0 || y < 0) throw new Error(`Only coordinates between 0 and the gameboard size are allowed. (${sizeX}/${sizeY}).`);
         
-        gameboard_row = gameboard[y-1]; // ? Get the gameboard row of the attacked cell
-        attackedFieldInGameboard = gameboard_row[x-1]; // ? Get the attacked cell in the gameboard
-        fieldID = calculateFieldID(y, x); // ? Get attacked fieldID
-        attackedFieldAtDOM = document.querySelector(`.${player}${fieldID}`); // ? Get the attacked field as DOM-Element
+        let gameboard_row = gameboard[y-1]; // ? Get the gameboard row of the attacked cell
+        let attackedFieldInGameboard = gameboard_row[x-1]; // ? Get the attacked cell in the gameboard
+        let fieldID = calculateFieldID(y, x); // ? Get attacked fieldID
+        let attackedFieldAtDOM = document.querySelector(`.${player}${fieldID}`); // ? Get the attacked field as DOM-Element
     
         // ! Attack a ship
         if(typeof attackedFieldInGameboard !== 'number') { // ? If the attacked cell is not a number, so a ship object is in,  its a hit..
-            attackedShipID = attackedFieldAtDOM.getAttribute(`data-shipID`); // ? Get the attacked ship ID
-            attackedShipType = attackedFieldInGameboard.Type;
+            let attackedShipID = attackedFieldAtDOM.getAttribute(`data-shipID`); // ? Get the attacked ship ID
+            let attackedShipType = attackedFieldInGameboard.Type;
+            let attackedShipInFormation;
 
-            for(x = 0; x < shipFormation.length; x++){ // ? Get attacked ship in the player formation
-                val =  shipFormation[x];
-                if(val.ID === attackedShipID)  attackedShipInFormation = val;
+            console.log(`ship ID:`)
+            console.log(attackedShipID);
+            console.log(shipFormation);
+
+            for(let x = 0; x < shipFormation.length; x++){ // ? Get attacked ship in the player formation
+                let val =  shipFormation[x];
+                console.log("val");
+                console.log(val);
+                console.log(val.ID);
+                if(val.ID === attackedShipID) {attackedShipInFormation = val; console.log(val.ID, attackedShipID, attackedShipInFormation, true);};
             };
 
-            // attackedShipInFormation = shipFormation[attackedShipID]; // ? Get the attacked ship object in the shipFormation array
-
-
-            attackedShipAtDOMArray = document.querySelectorAll (`.${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
+            let  attackedShipAtDOMArray = document.querySelectorAll (`.${player}${attackedShipID}`); // ? Get the attacked ship (all sections) as DOM-Elements
 
             // ! Hit the ship
             attackedShipInFormation.hit(attackedFieldInGameboard.Section); // ? Hit the attacked ship
@@ -491,7 +498,7 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             };
             // ! If ship is destroyed
             if(attackedShipInFormation.sunkenState() === true){
-
+                console.log(attackedShipInFormation);
                 for(x of attackedShipAtDOMArray){
                     x.classList.add(`sunken-ship`); // ! Maybe an animation ???
                 };
@@ -516,43 +523,44 @@ const Gameboard = function (sizeX, sizeY, player, info, missedAttacks, shipIDCou
             };
     };
 
-    alive = () => {
+    const alive = () => {
     // Returns if there are ships on the gameboard or not
         if(formationCounter > 0) 
             {return true}
             else return false; 
     };
 
-    missedAttacksArray = () =>{
+    const missedAttacksArray = () =>{
         return missedAttacks;
     };
 
     return { sizeX, sizeY, gameboard, placement, player, receiveAttack, missedAttacks,  missedAttacksArray, shipFormation, formationCounter, alive,  };
+    };
 };
 
-const GameInformation = function (playerName){
+class GameInformation {
+    constructor (playerName){
     // ? Declaration
     this.playerName = playerName;
-    playerCounter = 0;
-    roundCounter = 0;
-    onTurn = `player`;
+    let playerCounter = 0, roundCounter = 0, onTurn = `player`;
 
     if(localStorage.Level === undefined) {localStorage.Level = `1`;} // ? Check & set actual level
 
-    actualOnTurn = () => {
+    const actualOnTurn = () => {
         return onTurn;
     };
 
-    newPlayer = () => { // ? Sign a new player
+    const newPlayer = () => { // ? Sign a new player
         playerCounter++; // ? Increase player counter
     };
 
-    nextRound = () => {
+    const nextRound = () => {
         roundCounter++; // ? Increase the round counter
-        onTurn === `player` ? onTurn = `cpu` : onTurn =  `player`; // ? Change who is on turn
-    };
+        onTurn === `player` ? onTurn = `cpu` : onTurn =  `player`; //  ?! Needed ?
+    }; 
 
     return { playerName, actualOnTurn, newPlayer, playerCounter, nextRound, roundCounter};
+    };
 };
 
 MainGameLoop = (playerName) => {
@@ -581,7 +589,7 @@ MainGameLoop = (playerName) => {
         if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
         
         this.player = player;
-        this.ship = shipType;
+        this.shipType = shipType;
         this.gameboard = gameboard;
         sizeY = gameboard.sizeY;
         sizeX = gameboard.sizeX;
