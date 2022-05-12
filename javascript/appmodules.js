@@ -317,6 +317,7 @@ class Gameboard {
             fieldID++; // ? Increase the field ID
             row.push(fieldID); // ? Push the field to the row array in the gameboard array
             const field = document.createElement(`div`); // ? Create the field DOM-Element with properties and append it to the row DOM-Element
+            field.id = `${player}-fieldID:${fieldID}`;
             field.classList.add(`fields`);
             field.setAttribute(`data-fieldID`, fieldID);
             field.setAttribute(`data-fieldY`, y);
@@ -328,12 +329,36 @@ class Gameboard {
 
             field.innerText = fieldID;
 
+          // ? Add Event-Listener for placing on human gameboard 
+         if(player !== `CPU`){
+            //  Proof if no random ship placement for human player is selected
+            if(document.querySelector(`.placement`).value === `Yes` ||
+                document.querySelector(`.placement`).value === `Ja`){
+                field.style.pointerEvents = `all`;
+                field.addEventListener(`mouseenter`, () => {
+                    field.classList.add(`placingHover`);
+                });
+
+                field.addEventListener(`mouseleave`, () => {
+                    field.classList.remove(`placingHover`);
+                });
+
+            };  
+        };
+
+        // ? Add Event-Listener for receiveAttack() the CPU gameboard 
+         if(player === `cpu`){
             field.addEventListener('click', () => {
                 y = parseInt(field.getAttribute(`data-fieldY`));
                 x = parseInt(field.getAttribute(`data-fieldX`));
                 receiveAttack(y, x);
                 info.nextRound(); // ? Trigger next round from a human attack
             });
+        };
+
+
+
+
 
             row_container.appendChild(field);
         };

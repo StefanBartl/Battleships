@@ -308,6 +308,13 @@ body {
   cursor: none;
 }
 
+.placingHover {
+  transform: scale(1.2);
+  background-color: white;
+  border: solid 2px red;
+}
+
+
 /* #region Pseudoelements */
 
 /* #endregion */

@@ -16,13 +16,14 @@ const section_about = document.createElement(`section`);
 const myLogo = new Image();
 const githubLogo = new Image();
 
-// ? Create the dropdown list for choosing random ship
+// ? Create the dropdown list to let human player choose random ship placement or not
 ship_placement.classList.add(`placement-container`);
 let select = document.createElement(`select`);
 select.classList.add(`placement`);
 select.name = `placement`;
 let placementValues;
-localStorage.language === "en" ? placementValues = [`Yes`, `No`] : placementValues = [`Ja`, `Nein`]; // ! Make sure yes is everytime selected automatically
+localStorage.language === "en" ? placementValues = [`Yes`, `No`] : placementValues = [`Ja`, `Nein`];
+// localStorage.language === "en" ? placementValues = [`No`, `Yes`] : placementValues = [`Nein`, `Ja`];
 for (const val of placementValues)
 {
      let option = document.createElement(`option`);

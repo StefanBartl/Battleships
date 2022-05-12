@@ -211,11 +211,18 @@ MainGameLoop = (playerName) => {
 
   };
 
-  // ? Invoke random ship placement: For human check first the dropdown list, for cpu invoke it definitely
+  // ? Invoke random ship placement: For human players check first the dropdown list, for cpu invoke it definitely
+ // Random placement for human players
   if(document.querySelector(`.placement`).value === `No` ||
         document.querySelector(`.placement`).value === `Nein`)
         placingRandomShipFormation(true);
+
   placingRandomShipFormation(false);
+
+
+
+
+
 
   // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
   interVal = 100;
