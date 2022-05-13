@@ -529,6 +529,8 @@ class Gameboard {
 
     const humanPlacingDestroyer = () => {
             // ? Proof if 'no random ship placement' for human player is selected
+                    let finished = false;
+
                     const fieldArray = document.querySelectorAll(`.${player}`)
                     fieldArray.forEach(element => {
                         let horizontal = true;
@@ -561,43 +563,66 @@ class Gameboard {
                             document.querySelector(`.${player}${nextVerIDFirst}`).classList.remove(`placingHover`);
                         }
 
-
                         if(fieldIDString[1] !== `0`){
+                            // ? Initialize first placement direction (full ship length)
+                            if(finished === false){
                             element.addEventListener(`mouseenter`, addDestroyerHor);
                             element.addEventListener(`mouseleave`, removeDestroyerHor);
-
-                            document.querySelector(`.changer`).addEventListener('click', () => {
-                                    if(horizontal === true){
-                                        console.log("Horizontal");
-                                        element.removeEventListener(`mouseenter`, addDestroyerHor);
-                                        element.removeEventListener(`mouseleave`, removeDestroyerHor);
-                                        element.addEventListener(`mouseenter`, addDestroyerVer);
-                                        element.addEventListener(`mouseleave`, removeDestroyerVer);
-                                        horizontal = false;
-                                        return;
-                                    };
-                                    if(horizontal === false){
-                                        console.log("Vertical");
-                                        element.removeEventListener(`mouseenter`, addDestroyerVer);
-                                        element.removeEventListener(`mouseleave`, removeDestroyerVer);
-                                        element.addEventListener(`mouseenter`, addDestroyerHor);
-                                        element.addEventListener(`mouseleave`, removeDestroyerHor);
-                                        horizontal = true;
-                                        return;
+                            };
+                            // ? Listen for keypress on space to change direction of placement
+                            document.addEventListener(`keyup`, (event) => {
+                                    if(event.code === `Space`){
+                                        event.preventDefault();
+                                        if(horizontal === true && finished === false){
+                                            element.removeEventListener(`mouseenter`, addDestroyerHor);
+                                            element.removeEventListener(`mouseleave`, removeDestroyerHor);
+                                            element.addEventListener(`mouseenter`, addDestroyerVer);
+                                            element.addEventListener(`mouseleave`, removeDestroyerVer);
+                                            horizontal = false;
+                                            return;
+                                        };
+                                        if(horizontal === false && finished === false){
+                                            element.removeEventListener(`mouseenter`, addDestroyerVer);
+                                            element.removeEventListener(`mouseleave`, removeDestroyerVer);
+                                            element.addEventListener(`mouseenter`, addDestroyerHor);
+                                            element.addEventListener(`mouseleave`, removeDestroyerHor);
+                                            horizontal = true;
+                                            return;
+                                        };
                                     };
                                 });
-
-
                         };
 
+                        // ? Coordinates for placement
+                        let yValueBasis =  parseInt(element.getAttribute(`data-fieldy`));
+                        let xValueBasis = parseInt(element.getAttribute(`data-fieldx`));
+                    
+                        // ? Trigger placement
+                       element.addEventListener(`click`, () => {
+                           const arr = document.querySelectorAll(`.${player}`);
+                           arr.forEach(e => {
+                            e.removeEventListener(`mouseenter`, addDestroyerHor);
+                            e.removeEventListener(`mouseenter`, addDestroyerVer);
+                            e.style.pointerEvents = `none`;
+                           });
 
+                            if(horizontal === true){
+                                placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis, xValueBasis + 1]);
+                                console.log("po");
+                                finished = true;
+                                return true;
+                            };
+                            if(horizontal === false){
+                                placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis + 1, xValueBasis]);
+                                console.log("op");
+                                finished = true;
+                                return true;
+                            };
+                        });
                     });
 
 
-
-    }
-
-
+    };
 
     return { sizeX, sizeY, gameboard, placement, player, receiveAttack, missedAttacks,  missedAttacksArray, shipFormation, formationCounter, alive, humanPlacingDestroyer };
     };

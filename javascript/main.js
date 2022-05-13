@@ -218,16 +218,10 @@ MainGameLoop = (playerName) => {
         placingRandomShipFormation(true);
   placingRandomShipFormation(false);
 
-  if(document.querySelector(`.placement`).value === `Yes` ||
-  document.querySelector(`.placement`).value === `Ja`){
-    const changer = document.createElement(`div`);
-    changer.classList.add(`changer`);
-    document.body.appendChild(changer);
-    player_Gameboard.humanPlacingDestroyer();
-  };
-
-
-
+  // if(document.querySelector(`.placement`).value === `Yes` ||
+  // document.querySelector(`.placement`).value === `Ja`){
+  //   player_Gameboard.humanPlacingDestroyer();
+  // };
 
   // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
   interVal = 100;
