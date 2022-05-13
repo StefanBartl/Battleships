@@ -223,6 +223,153 @@ MainGameLoop = (playerName) => {
   //   player_Gameboard.humanPlacingDestroyer();
   // };
 
+  const but = document.createElement(`div`);
+  but.classList.add(`changer`);
+  document.body.appendChild(but);
+
+  function hovering (horizontal,  adding,  length, basis){
+    // ? Argument validation
+    if(typeof horizontal !== `boolean` || typeof adding !== 'boolean') throw new TypeError(`Arguments 'horizontal' and 'adding' must be a 'boolean'`);
+    if(typeof length !== `number` || typeof basis !== 'number') throw new TypeError(`Arguments 'length' and 'basisÄ must be a 'number'`); // ! Range
+
+    
+    if(horizontal === true && adding === true){
+        document.querySelector(`.${playerName}${basis}`).classList.add(`placingHover`);
+        if(length >= 2) document.querySelector(`.${playerName}${basis + 1}`).classList.add(`placingHover`);
+        if(length >= 3) document.querySelector(`.${playerName}${basis + 2}`).classList.add(`placingHover`);
+        if(length >= 4) document.querySelector(`.${playerName}${basis + 3}`).classList.add(`placingHover`);
+        if(length >= 5) document.querySelector(`.${playerName}${basis + 4}`).classList.add(`placingHover`);
+    };
+    if(horizontal === false && adding === true){
+        document.querySelector(`.${playerName}${basis}`).classList.add(`placingHover`);
+        if(length >= 2) document.querySelector(`.${playerName}${basis + 10}`).classList.add(`placingHover`);
+        if(length >= 3) document.querySelector(`.${playerName}${basis + 20}`).classList.add(`placingHover`);
+        if(length >= 4) document.querySelector(`.${playerName}${basis + 30}`).classList.add(`placingHover`);
+        if(length >= 5) document.querySelector(`.${playerName}${basis + 40}`).classList.add(`placingHover`);
+    };
+
+    if(horizontal === true && adding === false){
+        document.querySelector(`.${playerName}${basis}`).classList.remove(`placingHover`);
+        if(length >= 2) document.querySelector(`.${playerName}${basis + 1}`).classList.remove(`placingHover`);
+        if(length >= 3) document.querySelector(`.${playerName}${basis + 2}`).classList.remove(`placingHover`);
+        if(length >= 4) document.querySelector(`.${playerName}${basis + 3}`).classList.remove(`placingHover`);
+        if(length >= 5) document.querySelector(`.${playerName}${basis + 4}`).classList.remove(`placingHover`);
+    };
+    if(horizontal === false && adding === false){
+        document.querySelector(`.${playerName}${basis}`).classList.remove(`placingHover`);
+        if(length >= 2) document.querySelector(`.${playerName}${basis + 10}`).classList.remove(`placingHover`);
+        if(length >= 3) document.querySelector(`.${playerName}${basis + 20}`).classList.remove(`placingHover`);
+        if(length >= 4) document.querySelector(`.${playerName}${basis + 30}`).classList.remove(`placingHover`);
+        if(length >= 5) document.querySelector(`.${playerName}${basis + 40}`).classList.remove(`placingHover`);
+    };
+    return true;
+};
+
+
+function humanPlacementDestroyer() {
+return new Promise((resolve, reject) => {
+
+    const fieldArray = document.querySelectorAll(`.${playerName}`)
+    fieldArray.forEach(element => {
+        let horizontal = true;
+        element.style.pointerEvents = `all`;
+        let fieldIDString = element.getAttribute(`data-fieldID`);
+        let fieldID = parseInt(element.getAttribute(`data-fieldID`));
+        function att () {hovering(true, true, 2, fieldID)};
+        function btt (){hovering(true, false, 2, fieldID)};
+        function ctt () {hovering(false, true, 2, fieldID)};
+        function dtt () {hovering(false, false, 2, fieldID)};
+
+        if(fieldIDString[1] !== `0` && fieldID < 91){
+
+            element.addEventListener(`mouseenter`, att);
+            element.addEventListener(`mouseleave`, btt);
+
+            document.addEventListener(`keyup`, (event) => {
+                    if(event.code === `Space`){
+                        event.preventDefault();
+                        if(horizontal === true){
+                            element.removeEventListener(`mouseenter`, att);
+                            element.removeEventListener(`mouseleave`, btt);
+
+                            element.addEventListener(`mouseenter`, ctt);
+                            element.addEventListener(`mouseleave`, dtt);
+                            horizontal = false;
+                            return;
+                        };
+                        if(horizontal === false){
+                            element.removeEventListener(`mouseenter`, ctt);
+                            element.removeEventListener(`mouseleave`, dtt);
+
+                            element.addEventListener(`mouseenter`, att);
+                            element.addEventListener(`mouseleave`, btt);
+                            horizontal = true;
+                            return;
+                        };
+                    };
+                });
+        };
+
+        let yValueBasis =  parseInt(element.getAttribute(`data-fieldy`));
+        let xValueBasis = parseInt(element.getAttribute(`data-fieldx`));
+
+        element.addEventListener(`click`, () => {
+            if(horizontal === true){
+               player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis, xValueBasis + 1]);
+                console.log("po");
+                resolve({ var: "Hello Steve" });
+                return true;
+            };
+            if(horizontal === false){
+                player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis + 1, xValueBasis]);
+                console.log("op");
+                resolve({ var: "Hello Steve" });
+                return true;
+            };
+        });
+    });
+
+    // but.addEventListener(`click`, () =>{
+    //     resolve({ var: "Hello Steve" });
+    // });
+});
+
+
+};
+
+  if(document.querySelector(`.placement`).value === `Yes` ||
+  document.querySelector(`.placement`).value === `Ja`){
+
+
+
+    async function result() {
+        const first = await humanPlacementDestroyer();
+        console.log(first);
+    };                 
+    result();
+
+
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
   interVal = 100;
   cpuAttackInterval =  setInterval(() => {
