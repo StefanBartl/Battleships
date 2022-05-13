@@ -265,6 +265,10 @@ MainGameLoop = (playerName) => {
     return true;
 };
 
+function att (id) {hovering(true, true, 2, id)};
+function btt (id){hovering(true, false, 2, id)};
+function ctt (id) {hovering(false, true, 2, id)};
+function dtt (id) {hovering(false, false, 2, id)};
 
 function humanPlacementDestroyer() {
 return new Promise((resolve, reject) => {
@@ -275,34 +279,35 @@ return new Promise((resolve, reject) => {
         element.style.pointerEvents = `all`;
         let fieldIDString = element.getAttribute(`data-fieldID`);
         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
-        function att () {hovering(true, true, 2, fieldID)};
-        function btt (){hovering(true, false, 2, fieldID)};
-        function ctt () {hovering(false, true, 2, fieldID)};
-        function dtt () {hovering(false, false, 2, fieldID)};
+
 
         if(fieldIDString[1] !== `0` && fieldID < 91){
+           function a(){att(fieldID)};
+           function b(){btt(fieldID)};
+           function c(){ctt(fieldID)};
+           function d(){dtt(fieldID)};
 
-            element.addEventListener(`mouseenter`, att);
-            element.addEventListener(`mouseleave`, btt);
+            element.addEventListener(`mouseenter`, a);
+            element.addEventListener(`mouseleave`, b);
 
             document.addEventListener(`keyup`, (event) => {
                     if(event.code === `Space`){
                         event.preventDefault();
                         if(horizontal === true){
-                            element.removeEventListener(`mouseenter`, att);
-                            element.removeEventListener(`mouseleave`, btt);
+                            element.removeEventListener(`mouseenter`, a);
+                            element.removeEventListener(`mouseleave`, b);
 
-                            element.addEventListener(`mouseenter`, ctt);
-                            element.addEventListener(`mouseleave`, dtt);
+                            element.addEventListener(`mouseenter`, c);
+                            element.addEventListener(`mouseleave`, d);
                             horizontal = false;
                             return;
                         };
                         if(horizontal === false){
-                            element.removeEventListener(`mouseenter`, ctt);
-                            element.removeEventListener(`mouseleave`, dtt);
+                            element.removeEventListener(`mouseenter`, c);
+                            element.removeEventListener(`mouseleave`, d);
 
-                            element.addEventListener(`mouseenter`, att);
-                            element.addEventListener(`mouseleave`, btt);
+                            element.addEventListener(`mouseenter`, a);
+                            element.addEventListener(`mouseleave`, b);
                             horizontal = true;
                             return;
                         };
@@ -319,7 +324,6 @@ return new Promise((resolve, reject) => {
                 console.log("po");
                 const array_ = document.querySelectorAll(`.${playerName}`)
                 array_.forEach(e => {
-                    console.log(e);
                  e.removeEventListener(`mouseenter`, att);
                  e.removeEventListener(`mouseleave`, btt);
                  e.removeEventListener(`mouseenter`, ctt);
@@ -363,14 +367,14 @@ return new Promise((resolve, reject) => {
     async function result() {
         const first = await humanPlacementDestroyer();
         console.log(first);
-        const array__ = document.querySelectorAll(`.${playerName}`)
-        array__.forEach(e => {
-         e.removeEventListener(`mouseenter`, att);
-         e.removeEventListener(`mouseleave`, btt);
-         e.removeEventListener(`mouseenter`, ctt);
-         e.removeEventListener(`mouseleave`, dtt);
-        });
-        e.style.pointerEvents = `all`;
+        // const array__ = document.querySelectorAll(`.${playerName}`)
+        // array__.forEach(e  => {
+        //  e.removeEventListener(`mouseenter`, att, true);
+        //  e.removeEventListener(`mouseleave`, btt, true);
+        //  e.removeEventListener(`mouseenter`, ctt, true);
+        //  e.removeEventListener(`mouseleave`, dtt, true);
+        // });
+        // e.style.pointerEvents = `all`;
 
     };                 
     result();
