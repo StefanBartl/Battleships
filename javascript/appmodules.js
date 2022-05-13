@@ -531,6 +531,7 @@ class Gameboard {
             // ? Proof if 'no random ship placement' for human player is selected
                     const fieldArray = document.querySelectorAll(`.${player}`)
                     fieldArray.forEach(element => {
+                        let horizontal = true;
                         element.style.pointerEvents = `all`;
                         let fieldIDString = element.getAttribute(`data-fieldID`);
                         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
@@ -540,17 +541,55 @@ class Gameboard {
                         // ? Get next fieldsID-Values in vertical direction
                         let nextVerIDFirst = fieldID + 10;
 
-                        if(fieldIDString[1] !== `0`){
-                            element.addEventListener(`mouseenter`, () => {
-                                element.classList.add(`placingHover`);
-                                document.querySelector(`.${player}${nextHorIDFirst}`).classList.add(`placingHover`);
-                            });
-
-                            element.addEventListener(`mouseleave`, () => {
-                                element.classList.remove(`placingHover`);
-                                document.querySelector(`.${player}${nextHorIDFirst}`).classList.remove(`placingHover`);
-                            });
+                        function addDestroyerHor (){
+                            element.classList.add(`placingHover`);
+                            document.querySelector(`.${player}${nextHorIDFirst}`).classList.add(`placingHover`);
                         };
+
+                        function removeDestroyerHor() {
+                            element.classList.remove(`placingHover`);
+                            document.querySelector(`.${player}${nextHorIDFirst}`).classList.remove(`placingHover`);
+                        }
+
+                        function addDestroyerVer (){
+                            element.classList.add(`placingHover`);
+                            document.querySelector(`.${player}${nextVerIDFirst}`).classList.add(`placingHover`);
+                        };
+
+                        function removeDestroyerVer() {
+                            element.classList.remove(`placingHover`);
+                            document.querySelector(`.${player}${nextVerIDFirst}`).classList.remove(`placingHover`);
+                        }
+
+
+                        if(fieldIDString[1] !== `0`){
+                            element.addEventListener(`mouseenter`, addDestroyerHor);
+                            element.addEventListener(`mouseleave`, removeDestroyerHor);
+
+                            document.querySelector(`.changer`).addEventListener('click', () => {
+                                    if(horizontal === true){
+                                        console.log("Horizontal");
+                                        element.removeEventListener(`mouseenter`, addDestroyerHor);
+                                        element.removeEventListener(`mouseleave`, removeDestroyerHor);
+                                        element.addEventListener(`mouseenter`, addDestroyerVer);
+                                        element.addEventListener(`mouseleave`, removeDestroyerVer);
+                                        horizontal = false;
+                                        return;
+                                    };
+                                    if(horizontal === false){
+                                        console.log("Vertical");
+                                        element.removeEventListener(`mouseenter`, addDestroyerVer);
+                                        element.removeEventListener(`mouseleave`, removeDestroyerVer);
+                                        element.addEventListener(`mouseenter`, addDestroyerHor);
+                                        element.addEventListener(`mouseleave`, removeDestroyerHor);
+                                        horizontal = true;
+                                        return;
+                                    };
+                                });
+
+
+                        };
+
 
                     });
 

@@ -308,6 +308,16 @@ body {
   cursor: none;
 }
 
+.changer {
+  position: absolute;
+  left: 48%;
+  top: 10%;
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--wkd-black);
+  border-radius: 20%;
+}
+
 .placingHover {
   transform: scale(1.2);
   background-color: white;
