@@ -223,9 +223,9 @@ MainGameLoop = (playerName) => {
   //   player_Gameboard.humanPlacingDestroyer();
   // };
 
-  const but = document.createElement(`div`);
-  but.classList.add(`changer`);
-  document.body.appendChild(but);
+//   const but = document.createElement(`div`);
+//   but.classList.add(`changer`);
+//   document.body.appendChild(but);
 
   function hovering (horizontal,  adding,  length, basis){
     // ? Argument validation
@@ -317,12 +317,30 @@ return new Promise((resolve, reject) => {
             if(horizontal === true){
                player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis, xValueBasis + 1]);
                 console.log("po");
+                const array_ = document.querySelectorAll(`.${playerName}`)
+                array_.forEach(e => {
+                    console.log(e);
+                 e.removeEventListener(`mouseenter`, att);
+                 e.removeEventListener(`mouseleave`, btt);
+                 e.removeEventListener(`mouseenter`, ctt);
+                 e.removeEventListener(`mouseleave`, dtt);
+                 e.style.pointerEvents = `none`;
+                });
                 resolve({ var: "Hello Steve" });
                 return true;
             };
             if(horizontal === false){
                 player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis + 1, xValueBasis]);
+                element.removeEventListener(`mouseenter`, ctt);
+                element.removeEventListener(`mouseleave`, dtt);
                 console.log("op");
+                const array__ = document.querySelectorAll(`.${playerName}`)
+                array__.forEach(e => {
+                 e.removeEventListener(`mouseenter`, att);
+                 e.removeEventListener(`mouseleave`, btt);
+                 e.removeEventListener(`mouseenter`, ctt);
+                 e.removeEventListener(`mouseleave`, dtt);
+                });
                 resolve({ var: "Hello Steve" });
                 return true;
             };
@@ -345,6 +363,15 @@ return new Promise((resolve, reject) => {
     async function result() {
         const first = await humanPlacementDestroyer();
         console.log(first);
+        const array__ = document.querySelectorAll(`.${playerName}`)
+        array__.forEach(e => {
+         e.removeEventListener(`mouseenter`, att);
+         e.removeEventListener(`mouseleave`, btt);
+         e.removeEventListener(`mouseenter`, ctt);
+         e.removeEventListener(`mouseleave`, dtt);
+        });
+        e.style.pointerEvents = `all`;
+
     };                 
     result();
 
