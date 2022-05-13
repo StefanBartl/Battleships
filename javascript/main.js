@@ -216,10 +216,12 @@ MainGameLoop = (playerName) => {
   if(document.querySelector(`.placement`).value === `No` ||
         document.querySelector(`.placement`).value === `Nein`)
         placingRandomShipFormation(true);
-
   placingRandomShipFormation(false);
 
-
+  if(document.querySelector(`.placement`).value === `Yes` ||
+  document.querySelector(`.placement`).value === `Ja`){
+    player_Gameboard.humanPlacingDestroyer();
+  };
 
 
 

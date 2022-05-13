@@ -329,23 +329,6 @@ class Gameboard {
 
             field.innerText = fieldID;
 
-          // ? Add Event-Listener for placing on human gameboard 
-         if(player !== `CPU`){
-            //  Proof if no random ship placement for human player is selected
-            if(document.querySelector(`.placement`).value === `Yes` ||
-                document.querySelector(`.placement`).value === `Ja`){
-                field.style.pointerEvents = `all`;
-                field.addEventListener(`mouseenter`, () => {
-                    field.classList.add(`placingHover`);
-                });
-
-                field.addEventListener(`mouseleave`, () => {
-                    field.classList.remove(`placingHover`);
-                });
-
-            };  
-        };
-
         // ? Add Event-Listener for receiveAttack() the CPU gameboard 
          if(player === `cpu`){
             field.addEventListener('click', () => {
@@ -355,11 +338,6 @@ class Gameboard {
                 info.nextRound(); // ? Trigger next round from a human attack
             });
         };
-
-
-
-
-
             row_container.appendChild(field);
         };
         gameboard.push(row); // ? Push the row array within the fieldIDs to the gameboard array 
@@ -549,7 +527,40 @@ class Gameboard {
         return missedAttacks;
     };
 
-    return { sizeX, sizeY, gameboard, placement, player, receiveAttack, missedAttacks,  missedAttacksArray, shipFormation, formationCounter, alive,  };
+    const humanPlacingDestroyer = () => {
+            // ? Proof if 'no random ship placement' for human player is selected
+                    const fieldArray = document.querySelectorAll(`.${player}`)
+                    fieldArray.forEach(element => {
+                        element.style.pointerEvents = `all`;
+                        let fieldIDString = element.getAttribute(`data-fieldID`);
+                        let fieldID = parseInt(element.getAttribute(`data-fieldID`));
+
+                        // ? Get next fieldsID-Values in horizontal direction
+                       let nextHorIDFirst = fieldID + 1;
+                        // ? Get next fieldsID-Values in vertical direction
+                        let nextVerIDFirst = fieldID + 10;
+
+                        if(fieldIDString[1] !== `0`){
+                            element.addEventListener(`mouseenter`, () => {
+                                element.classList.add(`placingHover`);
+                                document.querySelector(`.${player}${nextHorIDFirst}`).classList.add(`placingHover`);
+                            });
+
+                            element.addEventListener(`mouseleave`, () => {
+                                element.classList.remove(`placingHover`);
+                                document.querySelector(`.${player}${nextHorIDFirst}`).classList.remove(`placingHover`);
+                            });
+                        };
+
+                    });
+
+
+
+    }
+
+
+
+    return { sizeX, sizeY, gameboard, placement, player, receiveAttack, missedAttacks,  missedAttacksArray, shipFormation, formationCounter, alive, humanPlacingDestroyer };
     };
 };
 
