@@ -37,186 +37,32 @@ todo storyline & level system
 
 
 MainGameLoop = (playerName) => {
-
+  
+  // ! Argument validation
   if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
 
+  //#region Preparations
   const game_container = document.createElement(`section`);
   game_container.classList.add(`game-container`);
   document.body.appendChild(game_container);
-
   const info = new GameInformation(playerName); // ? Open new GameInformation object  
+  const humanGameboard = new Gameboard(10, 10, playerName, info);  
+  const cpuGameboard = new Gameboard(10, 10, `CPU`, info); 
+  const human = new Player(playerName, true, humanGameboard, cpuGameboard, info); // ? Create human player object
+  const cpu = new Player(`CPU`, false, cpuGameboard, humanGameboard, info); // ? Create cpu player object
+//#endregion
 
-  //The game loop should set up a new game by creating Players and Gameboards. 
-  const player_Gameboard = new Gameboard(10, 10, playerName, info);  
-  const cpu_Gameboard = new Gameboard(10, 10, `CPU`, info); 
 
-  const Human = new Player(playerName, true, player_Gameboard, cpu_Gameboard, info); // ? Create human player object
-  const CPU = new Player(`CPU`, false, cpu_Gameboard, player_Gameboard, info); // ? Create cpu player object
 
-  // player_Gameboard.placement("Submarine", [3, 5], [3, 7]); // ? Placing a Submarine on the gameboard in the 1 column from r ow 3 to 5
-
-  // ? Invoking full ship formation by invoking placingRandomShipFormation() with passing true as argument for human gameboard and false for cpu gameboard
-  //+++ placingRandomShipFormation() needs existing gameboards and players. It expliciy have to live here in the code  +++
-  placingRandomShipFormation = (human) => {     
-
-    // ? Argument Validation
-    if(typeof human !== 'boolean') throw new TypeError(`Argument human must be a 'boolean'. You have passed a ${typeof human}`);
-    let player, gameboard;
-    human === true ? player = `human` : player = `cpu`;
-    human === true ? gameboard = player_Gameboard : gameboard = cpu_Gameboard;
-
-    randomPlacement = (player, gameboard, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
-    // ? Argument validation
-    if(typeof player !== 'string') throw new TypeError('Only strings are allowed as player arguments.');
-    if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
-    
-    this.player = player;
-    this.shipType = shipType;
-    this.gameboard = gameboard;
-    sizeY = gameboard.sizeY;
-    sizeX = gameboard.sizeX;
-    
-    if(shipType === `Destroyer`){
-        coordinates = randomShipPlacementValues(`Destroyer`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-        if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-            return false;
-        };
-
-        freeField = proofFieldForFree(coordinates, CPU);
-        if(freeField === false){
-            return false;
-        };
-
-        if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
-
-        if(player === `human`)  player_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        if(player === `cpu`)  cpu_Gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        return true;
-    };
-
-    if(shipType === `Submarine`){
-        coordinates = randomShipPlacementValues(`Submarine`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-        if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-            return false;
-        };
-    
-        freeField = proofFieldForFree(coordinates, CPU);
-        if(freeField === false){
-            return false;
-        };
-
-        if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
-
-        if(player === `human`)  player_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        if(player === `cpu`)  cpu_Gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        return true;
-    };
-
-    if(shipType === `Cruiser`){
-        coordinates = randomShipPlacementValues(`Cruiser`,  sizeY, sizeX); 
-        if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-            return false;
-        };
-        
-        freeField = proofFieldForFree(coordinates, CPU);
-        if(freeField === false){
-            return false;
-        };
-
-        if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
-
-        if(player === `human`)  player_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        if(player === `cpu`)  cpu_Gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        return true;
-    };
-
-    if(shipType === `Battleship`){
-        coordinates = randomShipPlacementValues(`Battleship`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-        if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-            return false;
-        };
-        
-        freeField = proofFieldForFree(coordinates, CPU);
-        if(freeField === false){
-            return false;
-        };
-
-        if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
-
-        if(player === `human`)  player_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        if(player === `cpu`)  cpu_Gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        return true;
-    };
-
-    if(shipType === `Carrier`){
-        coordinates = randomShipPlacementValues(`Carrier`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
-        if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
-            return false;
-        };
-
-        freeField = proofFieldForFree(coordinates, CPU);
-        if(freeField === false){
-            return false;
-        };
-
-        if(document.querySelector(`.${player}${shipType}`) !== null) return false; // ? Double placement security
-
-        if(player === `human`)  player_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        if(player === `cpu`)  cpu_Gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
-        return true;
-    };
-
-    throw new Error(`Only the strings 'Destroyer', 'Submarine', 'Cruiser', 'Battleship' or 'Carrier' are allowed as ship type.`) // ? If nothing returned before there must be a problem with the shipType string
-    };
-
-    destroyer = () =>{
-        val = randomPlacement(player, gameboard,  `Destroyer`);
-        if(val !== true) {
-            destroyer();
-        };
-    }; 
-
-    submarine = () =>{
-        val = randomPlacement(player, gameboard,  `Submarine`);
-        if(val !== true) {
-            submarine();
-        };
-    };
-
-    cruiser = () => {
-        val = randomPlacement(player, gameboard, `Cruiser`);
-        if(val !== true) {
-            cruiser();
-        };
-    };
-
-    battleship = () => {
-        val = randomPlacement(player, gameboard, `Battleship`);
-        if(val !== true) {
-            battleship();
-        };
-    };
-
-    carrier = () => {
-        val = randomPlacement(player, gameboard, `Carrier`);
-        if(val !== true)  {
-            carrier();
-        };
-    };
-
-    // ? Invoke ship creation and random placement
-    destroyer(); submarine(); cruiser(); battleship(); carrier();
-
-    return true;
-
-  };
-
-  // ? Invoke random ship placement: For human players check first the dropdown list, for cpu invoke it definitely
+  // ! Invoke random ship placement: For human players validate the dropdown-DOM-Element first, for cpu invoke it definitely
  // Random placement for human players
   if(document.querySelector(`.placement`).value === `No` ||
-        document.querySelector(`.placement`).value === `Nein`)
-        placingRandomShipFormation(true);
-  placingRandomShipFormation(false);
+        document.querySelector(`.placement`).value === `Nein`){
+            placingShipsRandomly(human, humanGameboard).all();
+            placingShipsRandomly(cpu, cpuGameboard).all();
+        };
+
+
 
   // if(document.querySelector(`.placement`).value === `Yes` ||
   // document.querySelector(`.placement`).value === `Ja`){
@@ -227,7 +73,7 @@ MainGameLoop = (playerName) => {
 //   but.classList.add(`changer`);
 //   document.body.appendChild(but);
 
-  function hovering (horizontal,  adding,  length, basis){
+function hovering (horizontal,  adding,  length, basis){
     // ? Argument validation
     if(typeof horizontal !== `boolean` || typeof adding !== 'boolean') throw new TypeError(`Arguments 'horizontal' and 'adding' must be a 'boolean'`);
     if(typeof length !== `number` || typeof basis !== 'number') throw new TypeError(`Arguments 'length' and 'basisÄ must be a 'number'`); // ! Range
@@ -310,8 +156,8 @@ return new Promise((resolve, reject) => {
            
            // ? Start adding listener 
             if(fieldIDString[1] !== `0` && fieldIDString[1] !== `9`){
-                element.addEventListener(`mouseenter`, a);
-                element.addEventListener(`mouseleave`, b);
+                // element.addEventListener(`mouseenter`, a);
+                // element.addEventListener(`mouseleave`, b);
             };
 
 
@@ -321,19 +167,19 @@ return new Promise((resolve, reject) => {
                         if(horizontal === true){
                             element.removeEventListener(`mouseenter`, a);
                             element.removeEventListener(`mouseleave`, b);
+                            horizontal = false;
 
                             element.addEventListener(`mouseenter`, c);
                             element.addEventListener(`mouseleave`, d);
-                            horizontal = false;
                             return;
                         };
                         if(horizontal === false){
                             element.removeEventListener(`mouseenter`, c);
                             element.removeEventListener(`mouseleave`, d);
+                            horizontal = true;
 
                             element.addEventListener(`mouseenter`, a);
                             element.addEventListener(`mouseleave`, b);
-                            horizontal = true;
                             return;
                         };
                     };
@@ -486,7 +332,7 @@ return new Promise((resolve, reject) => {
 
         element.addEventListener(`click`, () => {
             if(horizontal === true){
-               player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis, xValueBasis + 1]);
+               humanGameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis, xValueBasis + 1]);
                 console.log("po");
                 const array_ = document.querySelectorAll(`.${playerName}`)
                 array_.forEach(e => {
@@ -500,7 +346,7 @@ return new Promise((resolve, reject) => {
                 return true;
             };
             if(horizontal === false){
-                player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis + 1, xValueBasis]);
+                humanGameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis + 1, xValueBasis]);
                 element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
                 element.removeEventListener(`mouseleave`, hoverFourDestroyer);
                 console.log("op");
@@ -524,8 +370,6 @@ return new Promise((resolve, reject) => {
   if(document.querySelector(`.placement`).value === `Yes` ||
   document.querySelector(`.placement`).value === `Ja`){
 
-
-
     async function result() {
         const first = await humanPlacementDestroyer(`Destroyer`);
         console.log(first);
@@ -537,42 +381,25 @@ return new Promise((resolve, reject) => {
         //  e.removeEventListener(`mouseleave`, dtt, true);
         // });
         // e.style.pointerEvents = `all`;
-
     };                 
     result();
-
-
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   // ? Trigger cpu attack after a human attack. Check every interVal if CPU is on turn
   interVal = 100;
   cpuAttackInterval =  setInterval(() => {
       if(info.actualOnTurn() === `cpu`) {
-          CPU.cpuAttack();
+          cpu.cpuAttack();
           info.nextRound(); // ? Trigger next round from a cpu attack
       };
   }, interVal);
   // clearInterval(cpuAttackInterval); // ? To clear the interval f.e. after the game end
 };
+
+
+
+
 
 startGame_btn.addEventListener(`click`, () => {
   // ? Name Validation and storing

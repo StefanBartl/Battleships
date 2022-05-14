@@ -123,6 +123,155 @@ proofFieldForFree = (coordinates, playerToProof) => {
         };
 };
 
+// ! Invoking full ship formation
+placingShipsRandomly = (player, gameboard) => {     
+
+// ? Argument Validation
+// if(typeof human !== 'boolean') throw new TypeError(`Argument human must be a 'boolean'. You have passed a ${typeof human}`);
+
+randomPlacement = (player, gameboard, shipType) => {   // ? Player must be a 'human' or 'cpu' string with 'Destroyer', 'Submarine', 'Cruiser', 'Battleship'or 'Carrier' ship type
+// ? Argument validation
+if(typeof player !== 'object') throw new TypeError('Only objects are allowed as player arguments.');
+if(typeof shipType !== 'string') throw new TypeError(`The shipType argument must be a 'string'`);
+
+this.player = player;
+this.name = player.name;
+this.shipType = shipType;
+this.gameboard = gameboard;
+sizeY = gameboard.sizeY;
+sizeX = gameboard.sizeX;
+
+if(shipType === `Destroyer`){
+    coordinates = randomShipPlacementValues(`Destroyer`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+    if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+        return false;
+    };
+
+    freeField = proofFieldForFree(coordinates, player);
+    if(freeField === false){
+        return false;
+    };
+
+    if(document.querySelector(`.${name}${shipType}`) !== null) return false; // ? Double placement security
+
+    gameboard.placement(`Destroyer`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+    return true;
+};
+
+if(shipType === `Submarine`){
+    coordinates = randomShipPlacementValues(`Submarine`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+    if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+        return false;
+    };
+
+    freeField = proofFieldForFree(coordinates, player);
+    if(freeField === false){
+        return false;
+    };
+
+    if(document.querySelector(`.${name}${shipType}`) !== null) return false; // ? Double placement security
+
+    gameboard.placement(`Submarine`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+    return true;
+};
+
+if(shipType === `Cruiser`){
+    coordinates = randomShipPlacementValues(`Cruiser`,  sizeY, sizeX); 
+    if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+        return false;
+    };
+    
+    freeField = proofFieldForFree(coordinates, player);
+    if(freeField === false){
+        return false;
+    };
+
+    if(document.querySelector(`.${name}${shipType}`) !== null) return false; // ? Double placement security
+
+    gameboard.placement(`Cruiser`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+    return true;
+};
+
+if(shipType === `Battleship`){
+    coordinates = randomShipPlacementValues(`Battleship`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+    if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+        return false;
+    };
+    
+    freeField = proofFieldForFree(coordinates, player);
+    if(freeField === false){
+        return false;
+    };
+
+    if(document.querySelector(`.${name}${shipType}`) !== null) return false; // ? Double placement security
+
+    gameboard.placement(`Battleship`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+    return true;
+};
+
+if(shipType === `Carrier`){
+    coordinates = randomShipPlacementValues(`Carrier`, sizeY, sizeX);  // console.log(destroyerCoordinates); // console.log([destroyerCoordinates.start[0],destroyerCoordinates.start[1]], [destroyerCoordinates.end[0], destroyerCoordinates.end[1]]);
+    if(typeof coordinates.start[0] !== 'number' || typeof coordinates.start[1] !== 'number' || typeof coordinates.end[0] !== 'number' || typeof coordinates.end[1] !== 'number'){
+        return false;
+    };
+
+    freeField = proofFieldForFree(coordinates, player);
+    if(freeField === false){
+        return false;
+    };
+
+    if(document.querySelector(`.${name}${shipType}`) !== null) return false; // ? Double placement security
+
+    gameboard.placement(`Carrier`, [coordinates.start[0], coordinates.start[1]], [coordinates.end[0], coordinates.end[1]]);  
+    return true;
+};
+
+throw new Error(`Only the strings 'Destroyer', 'Submarine', 'Cruiser', 'Battleship' or 'Carrier' are allowed as ship type.`) // ? If nothing returned before there must be a problem with the shipType string
+};
+
+destroyer = () =>{
+    val = randomPlacement(player, gameboard,  `Destroyer`);
+    if(val !== true) {
+        destroyer();
+    };
+}; 
+
+submarine = () =>{
+    val = randomPlacement(player, gameboard,  `Submarine`);
+    if(val !== true) {
+        submarine();
+    };
+};
+
+cruiser = () => {
+    val = randomPlacement(player, gameboard, `Cruiser`);
+    if(val !== true) {
+        cruiser();
+    };
+};
+
+battleship = () => {
+    val = randomPlacement(player, gameboard, `Battleship`);
+    if(val !== true) {
+        battleship();
+    };
+};
+
+carrier = () => {
+    val = randomPlacement(player, gameboard, `Carrier`);
+    if(val !== true)  {
+        carrier();
+    };
+};
+
+all = () => {
+    destroyer(); submarine(); cruiser(); battleship(); carrier();
+};
+
+return {destroyer, submarine, cruiser, battleship, carrier, all };
+
+};
+
 //#endregion
 
 
