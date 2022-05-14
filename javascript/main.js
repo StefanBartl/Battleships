@@ -139,7 +139,7 @@ return new Promise((resolve, reject) => {
 
     const fieldArray = document.querySelectorAll(`.${playerName}`)
     fieldArray.forEach(element => {
-        let horizontal = true, finalized = false;
+        let horizontal = true;
         element.style.pointerEvents = `all`;
         let fieldNumberString = element.getAttribute(`data-fieldID`);
         let fieldNumberInteger = parseInt(fieldNumberString);
@@ -154,7 +154,6 @@ return new Promise((resolve, reject) => {
            function c(){hoverThreeDestroyer(fieldID)};
            function d(){hoverFourDestroyer(fieldID)};
 
-
            // ? Start adding listener 
             if(horizontal === true && fieldNumberString[1] !== `0`){
                 element.addEventListener(`mouseenter`, a);
@@ -165,173 +164,181 @@ return new Promise((resolve, reject) => {
             document.addEventListener(`keyup`, (event) => {
                     if(event.code === `Space`){
                         event.preventDefault();
-                        finalized = false;
-                        if(horizontal === true && fieldNumberString[1] !== `0`){
-                            element.removeEventListener(`mouseenter`, a);
-                            element.removeEventListener(`mouseleave`, b);
-                            horizontal = false;
-                    };
 
-                        if(horizontal === false && fieldNumberInteger < 91){
+                        // ? Remove all attached listeners
+                        element.removeEventListener(`mouseenter`, a);
+                        element.removeEventListener(`mouseleave`, b);
+                        element.removeEventListener(`mouseenter`, c);
+                        element.removeEventListener(`mouseleave`, d);
 
-                            element.removeEventListener(`mouseenter`, c);
-                            element.removeEventListener(`mouseleave`, d);
-                            horizontal = true;
-
-                            if(horizontal === true && fieldNumberString[1] !== `0`){
+                        // ? Attach new listeners depending on the direction
+                        if(horizontal === true && fieldNumberInteger < 91){
+                            element.addEventListener(`mouseenter`, c);
+                            element.addEventListener(`mouseleave`, d);
+                        };
+                        if(horizontal === false && fieldNumberString[1] !== `0`){
                                 element.addEventListener(`mouseenter`, a);
                                 element.addEventListener(`mouseleave`, b);
-                            };
+                           }; 
 
-                            return;
-                        };
-                    };
-                });
+                        // ? Toggle horizontal pointer and return
+                        horizontal === true ? horizontal = false : horizontal = true;
+                        return;
+                    };});
         };
 
         // ? Submarine
-        if(type === `Submarine` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `9`){
+        if(type === `Submarine`){
             function e(){hoverOneSubmarine(fieldID)};
             function f(){hoverTwoSubmarine(fieldID)};
             function g(){hoverThreeSubmarine(fieldID)};
             function h(){hoverFourSubmarine(fieldID)};
  
-             element.addEventListener(`mouseenter`, e);
-             element.addEventListener(`mouseleave`, f);
+            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+                element.addEventListener(`mouseenter`, e);
+                element.addEventListener(`mouseleave`, f);
+            };
  
              document.addEventListener(`keyup`, (event) => {
-                     if(event.code === `Space`){
-                         event.preventDefault();
-                         if(horizontal === true){
-                             element.removeEventListener(`mouseenter`, e);
-                             element.removeEventListener(`mouseleave`, f);
- 
-                             element.addEventListener(`mouseenter`, g);
-                             element.addEventListener(`mouseleave`, h);
-                             horizontal = false;
-                             return;
-                         };
-                         if(horizontal === false){
-                             element.removeEventListener(`mouseenter`, g);
-                             element.removeEventListener(`mouseleave`, h);
- 
-                             element.addEventListener(`mouseenter`, e);
-                             element.addEventListener(`mouseleave`, f);
-                             horizontal = true;
-                             return;
-                         };
-                     };
-                 });
-         };
+                if(event.code === `Space`){
+                    event.preventDefault();
+                    
+                    element.removeEventListener(`mouseenter`, e);
+                    element.removeEventListener(`mouseleave`, f);
+                    element.removeEventListener(`mouseenter`, g);
+                    element.removeEventListener(`mouseleave`, h);
+
+                    if(horizontal === true && fieldNumberInteger < 81){
+                        element.addEventListener(`mouseenter`, g);
+                        element.addEventListener(`mouseleave`, h);
+                    };
+                    if(horizontal === false && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9`){
+                        element.addEventListener(`mouseenter`, e);
+                        element.addEventListener(`mouseleave`, f);
+                       }; 
+
+                    horizontal === true ? horizontal = false : horizontal = true;
+                    return;
+                };});
+        };
+         
 
         // ? Cruiser
-        if(type === `Cruiser` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `9`){
+        if(type === `Cruiser`){
             function i(){hoverOneCruiser(fieldID)};
             function j(){hoverTwoCruiser(fieldID)};
             function k(){hoverThreeCruiser(fieldID)};
             function l(){hoverFourCruiser(fieldID)};
  
-             element.addEventListener(`mouseenter`, i);
-             element.addEventListener(`mouseleave`, j);
+            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
+                element.addEventListener(`mouseenter`, i);
+                element.addEventListener(`mouseleave`, j);
+            };
+
  
              document.addEventListener(`keyup`, (event) => {
-                     if(event.code === `Space`){
-                         event.preventDefault();
-                         if(horizontal === true){
-                             element.removeEventListener(`mouseenter`, i);
-                             element.removeEventListener(`mouseleave`, j);
- 
-                             element.addEventListener(`mouseenter`, k);
-                             element.addEventListener(`mouseleave`, l);
-                             horizontal = false;
-                             return;
-                         };
-                         if(horizontal === false){
-                             element.removeEventListener(`mouseenter`, k);
-                             element.removeEventListener(`mouseleave`, l);
- 
-                             element.addEventListener(`mouseenter`, i);
-                             element.addEventListener(`mouseleave`, j);
-                             horizontal = true;
-                             return;
-                         };
-                     };
-                 });
-         };
+                if(event.code === `Space`){
+                    event.preventDefault();
+                    
+                    // ? Remove all attached listeners
+                    element.removeEventListener(`mouseenter`, i);
+                    element.removeEventListener(`mouseleave`, j);
+                    element.removeEventListener(`mouseenter`, k);
+                    element.removeEventListener(`mouseleave`, l);
+
+                    // ? Attach new listeners depending on the direction
+                    if(horizontal === true && fieldNumberInteger < 71){
+                        element.addEventListener(`mouseenter`, k);
+                        element.addEventListener(`mouseleave`, l);
+                    };
+                    if(horizontal === false && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
+                            element.addEventListener(`mouseenter`, i);
+                            element.addEventListener(`mouseleave`, j);
+                       }; 
+
+                    // ? Toggle horizontal pointer and return
+                    horizontal === true ? horizontal = false : horizontal = true;
+                    return;
+                };});
+        };
+
 
         // ? Battleship
-        if(type === `Battleship` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `6` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `9`){
+        if(type === `Battleship`){
             function m(){hoverOneBattleship(fieldID)};
             function n(){hoverTwoBattleship(fieldID)};
             function o(){hoverThreeBattleship(fieldID)};
             function p(){hoverFourBattleship(fieldID)};
  
-             element.addEventListener(`mouseenter`, m);
-             element.addEventListener(`mouseleave`, n);
+            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
+                element.addEventListener(`mouseenter`, m);
+                element.addEventListener(`mouseleave`, n);
+            };
  
              document.addEventListener(`keyup`, (event) => {
-                     if(event.code === `Space`){
-                         event.preventDefault();
-                         if(horizontal === true){
-                             element.removeEventListener(`mouseenter`, m);
-                             element.removeEventListener(`mouseleave`, n);
- 
-                             element.addEventListener(`mouseenter`, o);
-                             element.addEventListener(`mouseleave`, p);
-                             horizontal = false;
-                             return;
-                         };
-                         if(horizontal === false){
-                             element.removeEventListener(`mouseenter`, o);
-                             element.removeEventListener(`mouseleave`, p);
- 
-                             element.addEventListener(`mouseenter`, m);
-                             element.addEventListener(`mouseleave`, n);
-                             horizontal = true;
-                             return;
-                         };
-                     };
-                 });
-         };
+                if(event.code === `Space`){
+                    event.preventDefault();
+                    
+                    element.removeEventListener(`mouseenter`, m);
+                    element.removeEventListener(`mouseleave`, n);
+                    element.removeEventListener(`mouseenter`, o);
+                    element.removeEventListener(`mouseleave`, p);
+
+                    if(horizontal === true && fieldNumberInteger < 61){
+                        element.addEventListener(`mouseenter`, o);
+                        element.addEventListener(`mouseleave`, p);
+                    };
+                    if(horizontal === false && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
+                            element.addEventListener(`mouseenter`, m);
+                            element.addEventListener(`mouseleave`, n);
+                       }; 
+
+                    horizontal === true ? horizontal = false : horizontal = true;
+                    return;
+                };});
+        };
 
         // ? Carrier
-        if(type === `Carrier` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `5` && fieldNumberString[1] !== `6` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `9`){
+        if(type === `Carrier`){
+    
             function q(){hoverOneCarrier(fieldID)};
             function r(){hoverTwoCarrier(fieldID)};
-            function r(){hoverThreeCarrier(fieldID)};
-            function t(){hoverFourCarrier(fieldID)};
+            function s(){hoverThreeCarrier(fieldID)};
+            function t(){hoverFourCarrier(fieldID)};           
  
+            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `6`){
+                element.addEventListener(`mouseenter`, q);
+                element.addEventListener(`mouseleave`, r);
+            };
+
              element.addEventListener(`mouseenter`, q);
              element.addEventListener(`mouseleave`, r);
  
              document.addEventListener(`keyup`, (event) => {
-                     if(event.code === `Space`){
-                         event.preventDefault();
-                         if(horizontal === true){
-                             element.removeEventListener(`mouseenter`, q);
-                             element.removeEventListener(`mouseleave`, r);
- 
-                             element.addEventListener(`mouseenter`, r);
-                             element.addEventListener(`mouseleave`, t);
-                             horizontal = false;
-                             return;
-                         };
-                         if(horizontal === false){
-                             element.removeEventListener(`mouseenter`, r);
-                             element.removeEventListener(`mouseleave`, t);
- 
-                             element.addEventListener(`mouseenter`, q);
-                             element.addEventListener(`mouseleave`, r);
-                             horizontal = true;
-                             return;
-                         };
-                     };
-                 });
-         };
+                if(event.code === `Space`){
+                    event.preventDefault();
+                    
+                    element.removeEventListener(`mouseenter`, q);
+                    element.removeEventListener(`mouseleave`, r);
+                    element.removeEventListener(`mouseenter`, s);
+                    element.removeEventListener(`mouseleave`, t);
+
+                    if(horizontal === true && fieldNumberInteger < 51){
+                        element.addEventListener(`mouseenter`, s);
+                        element.addEventListener(`mouseleave`, t);
+                    };
+                    if(horizontal === false && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `6`){
+                            element.addEventListener(`mouseenter`, q);
+                            element.addEventListener(`mouseleave`, r);
+                       }; 
+
+                    horizontal === true ? horizontal = false : horizontal = true;
+                    return;
+                };});
+        };
 
 
          // ! Event-Listener to fullfill placement
-
         if(type === `Destroyer`){
             element.addEventListener(`click`, () => {
                 if(horizontal === true ){
@@ -339,166 +346,98 @@ return new Promise((resolve, reject) => {
                         humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 1]);
                         console.log("Destroyer horizontal placed.");
                     };
-                    // const array_ = document.querySelectorAll(`.${playerName}`)
-                    // array_.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    //  e.style.pointerEvents = `none`;
-                    // });
-                    placed = true;
                     resolve(true);
                     return true;
                 };
                 if(horizontal === false){
-                    humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 1, parseInt(element.getAttribute(`data-fieldx`))]);
-                    element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    element.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    console.log("Destroyer vertical placed.");
-                    // const array__ = document.querySelectorAll(`.${playerName}`)
-                    // array__.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 1, parseInt(element.getAttribute(`data-fieldx`))]);
+                        console.log("Destroyer vertical placed.");
+                    };
                     resolve(true);
                     return true;
                 };
             });
         };
 
-        if(type === `Submarine` && localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+        if(type === `Submarine`){
             element.addEventListener(`click`, () => {
                 if(horizontal === true){
-                   humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 2]);
-                    console.log("Submarine horizontal placed");
-                    // const array_ = document.querySelectorAll(`.${playerName}`)
-                    // array_.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    //  e.style.pointerEvents = `none`;
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 2]);
+                        console.log("Submarine horizontal placed");
+                    };
                     resolve(true);
                     return true;
                 };
                 if(horizontal === false){
-                    humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 2, parseInt(element.getAttribute(`data-fieldx`))]);
-                    element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    element.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    console.log("Submarine vertical placed");
-                    // const array__ = document.querySelectorAll(`.${playerName}`)
-                    // array__.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 2, parseInt(element.getAttribute(`data-fieldx`))]);
+                        console.log("Submarine vertical placed");
+                    };
                     resolve(true);
                     return true;
                 };
             });
         };
 
-        if(type === `Cruiser` && localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+        if(type === `Cruiser`){
             element.addEventListener(`click`, () => {
                 if(horizontal === true){
-                   humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 3]);
-                    console.log("Cruiser horizontal placed");
-                    // const array_ = document.querySelectorAll(`.${playerName}`)
-                    // array_.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    //  e.style.pointerEvents = `none`;
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 3]);
+                        console.log("Cruiser horizontal placed");
+                    };
                     resolve(true);
                     return true;
                 };
                 if(horizontal === false){
-                    humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 3, parseInt(element.getAttribute(`data-fieldx`))]);
-                    element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    element.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    console.log("Cruiser vertical placed");
-                    // const array__ = document.querySelectorAll(`.${playerName}`)
-                    // array__.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 3, parseInt(element.getAttribute(`data-fieldx`))]);
+                        console.log("Cruiser vertical placed");
+                    };
                     resolve(true);
                     return true;
                 };
             });
         };
 
-        if(type === `Battleship` && localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+        if(type === `Battleship`){
             element.addEventListener(`click`, () => {
                 if(horizontal === true){
-                   humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 4]);
-                    console.log("Battleship horizontal placed");
-                    // const array_ = document.querySelectorAll(`.${playerName}`)
-                    // array_.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    //  e.style.pointerEvents = `none`;
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 4]);
+                        console.log("Battleship horizontal placed");
+                    };
                     resolve(true);
                     return true;
                 };
                 if(horizontal === false){
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                     humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 4, parseInt(element.getAttribute(`data-fieldx`))]);
-                    element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    element.removeEventListener(`mouseleave`, hoverFourDestroyer);
                     console.log("Battleship vertical placed");
-                    // const array__ = document.querySelectorAll(`.${playerName}`)
-                    // array__.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    // });
+                    };
                     resolve(true);
                     return true;
                 };
             });
         };
 
-        if(type === `Carrier` && localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+        if(type === `Carrier`){
             element.addEventListener(`click`, () => {
                 if(horizontal === true){
-                   humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 5]);
-                    console.log("Carrier horizontal placed");
-                    // const array_ = document.querySelectorAll(`.${playerName}`)
-                    // array_.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    //  e.style.pointerEvents = `none`;
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 5]);
+                        console.log("Carrier horizontal placed");
+                    };
                     resolve(true);
                     return true;
                 };
                 if(horizontal === false){
-                    humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 5, parseInt(element.getAttribute(`data-fieldx`))]);
-                    element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    element.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    console.log("Carrier vertical placed");
-                    // const array__ = document.querySelectorAll(`.${playerName}`)
-                    // array__.forEach(e => {
-                    //  e.removeEventListener(`mouseenter`, hoverOneDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
-                    //  e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
-                    //  e.removeEventListener(`mouseleave`, hoverFourDestroyer);
-                    // });
+                    if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
+                        humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 5, parseInt(element.getAttribute(`data-fieldx`))]);
+                        console.log("Carrier vertical placed");
+                    };
                     resolve(true);
                     return true;
                 };
