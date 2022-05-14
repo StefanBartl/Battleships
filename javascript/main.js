@@ -41,6 +41,7 @@ MainGameLoop = (playerName) => {
   // ! Argument validation
   if(typeof playerName !== 'string') throw new TypeError(`Player name must be a 'string'`); // ? Argument validation
 
+  
   //#region Preparations
   const game_container = document.createElement(`section`);
   game_container.classList.add(`game-container`);
@@ -53,21 +54,13 @@ MainGameLoop = (playerName) => {
 //#endregion
 
 
-
   // ! Invoke random ship placement: For human players validate the dropdown-DOM-Element first, for cpu invoke it definitely
+  placingShipsRandomly(cpu, cpuGameboard).all();
  // Random placement for human players
   if(document.querySelector(`.placement`).value === `No` ||
         document.querySelector(`.placement`).value === `Nein`){
             placingShipsRandomly(human, humanGameboard).all();
-            placingShipsRandomly(cpu, cpuGameboard).all();
         };
-
-
-
-  // if(document.querySelector(`.placement`).value === `Yes` ||
-  // document.querySelector(`.placement`).value === `Ja`){
-  //   player_Gameboard.humanPlacingDestroyer();
-  // };
 
 //   const but = document.createElement(`div`);
 //   but.classList.add(`changer`);
@@ -137,7 +130,7 @@ function hoverTwoCarrier (id){hovering(true, false, 5, id)};
 function hoverThreeCarrier (id) {hovering(false, true, 5, id)};
 function hoverFourCarrier (id) {hovering(false, false, 5, id)};
 
-function humanPlacementDestroyer(type) {
+function humanPlacementDestroyer(type, playerName) {
 return new Promise((resolve, reject) => {
 
     const fieldArray = document.querySelectorAll(`.${playerName}`)
@@ -148,7 +141,7 @@ return new Promise((resolve, reject) => {
         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
 
         // ? Destroyer
-        if(type = `Destroyer`){
+        if(type === `Destroyer`){
            function a(){hoverOneDestroyer(fieldID)};
            function b(){hoverTwoDestroyer(fieldID)};
            function c(){hoverThreeDestroyer(fieldID)};
@@ -156,8 +149,8 @@ return new Promise((resolve, reject) => {
            
            // ? Start adding listener 
             if(fieldIDString[1] !== `0` && fieldIDString[1] !== `9`){
-                // element.addEventListener(`mouseenter`, a);
-                // element.addEventListener(`mouseleave`, b);
+                element.addEventListener(`mouseenter`, a);
+                element.addEventListener(`mouseleave`, b);
             };
 
 
@@ -187,11 +180,11 @@ return new Promise((resolve, reject) => {
         };
 
         // ? Submarine
-        if(type = `Submarine` && fieldIDString[1] !== `0` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
-            function a(){hoverOneDestroyer(fieldID)};
-            function b(){hoverTwoDestroyer(fieldID)};
-            function c(){hoverThreeDestroyer(fieldID)};
-            function d(){hoverFourDestroyer(fieldID)};
+        if(type === `Submarine` && fieldIDString[1] !== `0` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneSubmarine(fieldID)};
+            function b(){hoverTwoSubmarine(fieldID)};
+            function c(){hoverThreeSubmarine(fieldID)};
+            function d(){hoverFourSubmarine(fieldID)};
  
              element.addEventListener(`mouseenter`, a);
              element.addEventListener(`mouseleave`, b);
@@ -222,11 +215,11 @@ return new Promise((resolve, reject) => {
          };
 
         // ? Cruiser
-        if(type = `Cruiser` && fieldIDString[1] !== `0` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
-            function a(){hoverOneDestroyer(fieldID)};
-            function b(){hoverTwoDestroyer(fieldID)};
-            function c(){hoverThreeDestroyer(fieldID)};
-            function d(){hoverFourDestroyer(fieldID)};
+        if(type === `Cruiser` && fieldIDString[1] !== `0` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneCruiser(fieldID)};
+            function b(){hoverTwoCruiser(fieldID)};
+            function c(){hoverThreeCruiser(fieldID)};
+            function d(){hoverFourCruiser(fieldID)};
  
              element.addEventListener(`mouseenter`, a);
              element.addEventListener(`mouseleave`, b);
@@ -257,11 +250,11 @@ return new Promise((resolve, reject) => {
          };
 
         // ? Battleship
-        if(type = `Battleship` && fieldIDString[1] !== `0` && fieldIDString[1] !== `6` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
-            function a(){hoverOneDestroyer(fieldID)};
-            function b(){hoverTwoDestroyer(fieldID)};
-            function c(){hoverThreeDestroyer(fieldID)};
-            function d(){hoverFourDestroyer(fieldID)};
+        if(type === `Battleship` && fieldIDString[1] !== `0` && fieldIDString[1] !== `6` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneBattleship(fieldID)};
+            function b(){hoverTwoBattleship(fieldID)};
+            function c(){hoverThreeBattleship(fieldID)};
+            function d(){hoverFourBattleship(fieldID)};
  
              element.addEventListener(`mouseenter`, a);
              element.addEventListener(`mouseleave`, b);
@@ -292,11 +285,11 @@ return new Promise((resolve, reject) => {
          };
 
         // ? Carrier
-        if(type = `Carrier` && fieldIDString[1] !== `0` && fieldIDString[1] !== `5` && fieldIDString[1] !== `6` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
-            function a(){hoverOneDestroyer(fieldID)};
-            function b(){hoverTwoDestroyer(fieldID)};
-            function c(){hoverThreeDestroyer(fieldID)};
-            function d(){hoverFourDestroyer(fieldID)};
+        if(type === `Carrier` && fieldIDString[1] !== `0` && fieldIDString[1] !== `5` && fieldIDString[1] !== `6` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneCarrier(fieldID)};
+            function b(){hoverTwoCarrier(fieldID)};
+            function c(){hoverThreeCarrier(fieldID)};
+            function d(){hoverFourCarrier(fieldID)};
  
              element.addEventListener(`mouseenter`, a);
              element.addEventListener(`mouseleave`, b);
@@ -361,6 +354,11 @@ return new Promise((resolve, reject) => {
                 return true;
             };
         });
+
+
+
+
+
     });
 });
 
@@ -371,8 +369,11 @@ return new Promise((resolve, reject) => {
   document.querySelector(`.placement`).value === `Ja`){
 
     async function result() {
-        const first = await humanPlacementDestroyer(`Destroyer`);
+        const first = await humanPlacementDestroyer(`Destroyer`, playerName);
         console.log(first);
+        const secv = await humanPlacementDestroyer(`Submarine`, playerName);
+        console.log(secv);
+
         // const array__ = document.querySelectorAll(`.${playerName}`)
         // array__.forEach(e  => {
         //  e.removeEventListener(`mouseenter`, att, true);
@@ -396,10 +397,6 @@ return new Promise((resolve, reject) => {
   }, interVal);
   // clearInterval(cpuAttackInterval); // ? To clear the interval f.e. after the game end
 };
-
-
-
-
 
 startGame_btn.addEventListener(`click`, () => {
   // ? Name Validation and storing
