@@ -265,12 +265,33 @@ MainGameLoop = (playerName) => {
     return true;
 };
 
-function att (id) {hovering(true, true, 2, id)};
-function btt (id){hovering(true, false, 2, id)};
-function ctt (id) {hovering(false, true, 2, id)};
-function dtt (id) {hovering(false, false, 2, id)};
+// ! Helper functions for hover-effect in human player placement
+function hoverOneDestroyer (id) {hovering(true, true, 2, id)};
+function hoverTwoDestroyer (id){hovering(true, false, 2, id)};
+function hoverThreeDestroyer (id) {hovering(false, true, 2, id)};
+function hoverFourDestroyer (id) {hovering(false, false, 2, id)};
 
-function humanPlacementDestroyer() {
+function hoverOneSubmarine (id) {hovering(true, true, 3, id)};
+function hoverTwoSubmarine (id){hovering(true, false, 3, id)};
+function hoverThreeSubmarine (id) {hovering(false, true, 3, id)};
+function hoverFourSubmarine (id) {hovering(false, false, 3, id)};
+
+function hoverOneCruiser (id) {hovering(true, true, 3, id)};
+function hoverTwoCruiser (id){hovering(true, false, 3, id)};
+function hoverThreeCruiser (id) {hovering(false, true, 3, id)};
+function hoverFourCruiser (id) {hovering(false, false, 3, id)};
+
+function hoverOneBattleship (id) {hovering(true, true, 4, id)};
+function hoverTwoBattleship (id){hovering(true, false, 4, id)};
+function hoverThreeBattleship (id) {hovering(false, true, 4, id)};
+function hoverFourBattleship(id) {hovering(false, false, 4, id)};
+
+function hoverOneCarrier (id) {hovering(true, true, 5, id)};
+function hoverTwoCarrier (id){hovering(true, false, 5, id)};
+function hoverThreeCarrier (id) {hovering(false, true, 5, id)};
+function hoverFourCarrier (id) {hovering(false, false, 5, id)};
+
+function humanPlacementDestroyer(type) {
 return new Promise((resolve, reject) => {
 
     const fieldArray = document.querySelectorAll(`.${playerName}`)
@@ -280,15 +301,19 @@ return new Promise((resolve, reject) => {
         let fieldIDString = element.getAttribute(`data-fieldID`);
         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
 
+        // ? Destroyer
+        if(type = `Destroyer`){
+           function a(){hoverOneDestroyer(fieldID)};
+           function b(){hoverTwoDestroyer(fieldID)};
+           function c(){hoverThreeDestroyer(fieldID)};
+           function d(){hoverFourDestroyer(fieldID)};
+           
+           // ? Start adding listener 
+            if(fieldIDString[1] !== `0` && fieldIDString[1] !== `9`){
+                element.addEventListener(`mouseenter`, a);
+                element.addEventListener(`mouseleave`, b);
+            };
 
-        if(fieldIDString[1] !== `0` && fieldID < 91){
-           function a(){att(fieldID)};
-           function b(){btt(fieldID)};
-           function c(){ctt(fieldID)};
-           function d(){dtt(fieldID)};
-
-            element.addEventListener(`mouseenter`, a);
-            element.addEventListener(`mouseleave`, b);
 
             document.addEventListener(`keyup`, (event) => {
                     if(event.code === `Space`){
@@ -315,6 +340,147 @@ return new Promise((resolve, reject) => {
                 });
         };
 
+        // ? Submarine
+        if(type = `Submarine` && fieldIDString[1] !== `0` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneDestroyer(fieldID)};
+            function b(){hoverTwoDestroyer(fieldID)};
+            function c(){hoverThreeDestroyer(fieldID)};
+            function d(){hoverFourDestroyer(fieldID)};
+ 
+             element.addEventListener(`mouseenter`, a);
+             element.addEventListener(`mouseleave`, b);
+ 
+             document.addEventListener(`keyup`, (event) => {
+                     if(event.code === `Space`){
+                         event.preventDefault();
+                         if(horizontal === true){
+                             element.removeEventListener(`mouseenter`, a);
+                             element.removeEventListener(`mouseleave`, b);
+ 
+                             element.addEventListener(`mouseenter`, c);
+                             element.addEventListener(`mouseleave`, d);
+                             horizontal = false;
+                             return;
+                         };
+                         if(horizontal === false){
+                             element.removeEventListener(`mouseenter`, c);
+                             element.removeEventListener(`mouseleave`, d);
+ 
+                             element.addEventListener(`mouseenter`, a);
+                             element.addEventListener(`mouseleave`, b);
+                             horizontal = true;
+                             return;
+                         };
+                     };
+                 });
+         };
+
+        // ? Cruiser
+        if(type = `Cruiser` && fieldIDString[1] !== `0` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneDestroyer(fieldID)};
+            function b(){hoverTwoDestroyer(fieldID)};
+            function c(){hoverThreeDestroyer(fieldID)};
+            function d(){hoverFourDestroyer(fieldID)};
+ 
+             element.addEventListener(`mouseenter`, a);
+             element.addEventListener(`mouseleave`, b);
+ 
+             document.addEventListener(`keyup`, (event) => {
+                     if(event.code === `Space`){
+                         event.preventDefault();
+                         if(horizontal === true){
+                             element.removeEventListener(`mouseenter`, a);
+                             element.removeEventListener(`mouseleave`, b);
+ 
+                             element.addEventListener(`mouseenter`, c);
+                             element.addEventListener(`mouseleave`, d);
+                             horizontal = false;
+                             return;
+                         };
+                         if(horizontal === false){
+                             element.removeEventListener(`mouseenter`, c);
+                             element.removeEventListener(`mouseleave`, d);
+ 
+                             element.addEventListener(`mouseenter`, a);
+                             element.addEventListener(`mouseleave`, b);
+                             horizontal = true;
+                             return;
+                         };
+                     };
+                 });
+         };
+
+        // ? Battleship
+        if(type = `Battleship` && fieldIDString[1] !== `0` && fieldIDString[1] !== `6` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneDestroyer(fieldID)};
+            function b(){hoverTwoDestroyer(fieldID)};
+            function c(){hoverThreeDestroyer(fieldID)};
+            function d(){hoverFourDestroyer(fieldID)};
+ 
+             element.addEventListener(`mouseenter`, a);
+             element.addEventListener(`mouseleave`, b);
+ 
+             document.addEventListener(`keyup`, (event) => {
+                     if(event.code === `Space`){
+                         event.preventDefault();
+                         if(horizontal === true){
+                             element.removeEventListener(`mouseenter`, a);
+                             element.removeEventListener(`mouseleave`, b);
+ 
+                             element.addEventListener(`mouseenter`, c);
+                             element.addEventListener(`mouseleave`, d);
+                             horizontal = false;
+                             return;
+                         };
+                         if(horizontal === false){
+                             element.removeEventListener(`mouseenter`, c);
+                             element.removeEventListener(`mouseleave`, d);
+ 
+                             element.addEventListener(`mouseenter`, a);
+                             element.addEventListener(`mouseleave`, b);
+                             horizontal = true;
+                             return;
+                         };
+                     };
+                 });
+         };
+
+        // ? Carrier
+        if(type = `Carrier` && fieldIDString[1] !== `0` && fieldIDString[1] !== `5` && fieldIDString[1] !== `6` && fieldIDString[1] !== `7` && fieldIDString[1] !== `8` && fieldIDString[1] !== `9`){
+            function a(){hoverOneDestroyer(fieldID)};
+            function b(){hoverTwoDestroyer(fieldID)};
+            function c(){hoverThreeDestroyer(fieldID)};
+            function d(){hoverFourDestroyer(fieldID)};
+ 
+             element.addEventListener(`mouseenter`, a);
+             element.addEventListener(`mouseleave`, b);
+ 
+             document.addEventListener(`keyup`, (event) => {
+                     if(event.code === `Space`){
+                         event.preventDefault();
+                         if(horizontal === true){
+                             element.removeEventListener(`mouseenter`, a);
+                             element.removeEventListener(`mouseleave`, b);
+ 
+                             element.addEventListener(`mouseenter`, c);
+                             element.addEventListener(`mouseleave`, d);
+                             horizontal = false;
+                             return;
+                         };
+                         if(horizontal === false){
+                             element.removeEventListener(`mouseenter`, c);
+                             element.removeEventListener(`mouseleave`, d);
+ 
+                             element.addEventListener(`mouseenter`, a);
+                             element.addEventListener(`mouseleave`, b);
+                             horizontal = true;
+                             return;
+                         };
+                     };
+                 });
+         };
+
+
         let yValueBasis =  parseInt(element.getAttribute(`data-fieldy`));
         let xValueBasis = parseInt(element.getAttribute(`data-fieldx`));
 
@@ -324,10 +490,10 @@ return new Promise((resolve, reject) => {
                 console.log("po");
                 const array_ = document.querySelectorAll(`.${playerName}`)
                 array_.forEach(e => {
-                 e.removeEventListener(`mouseenter`, att);
-                 e.removeEventListener(`mouseleave`, btt);
-                 e.removeEventListener(`mouseenter`, ctt);
-                 e.removeEventListener(`mouseleave`, dtt);
+                 e.removeEventListener(`mouseenter`, hoverOneDestroyer);
+                 e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
+                 e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
+                 e.removeEventListener(`mouseleave`, hoverFourDestroyer);
                  e.style.pointerEvents = `none`;
                 });
                 resolve({ var: "Hello Steve" });
@@ -335,25 +501,21 @@ return new Promise((resolve, reject) => {
             };
             if(horizontal === false){
                 player_Gameboard.placement(`Destroyer`, [yValueBasis, xValueBasis], [yValueBasis + 1, xValueBasis]);
-                element.removeEventListener(`mouseenter`, ctt);
-                element.removeEventListener(`mouseleave`, dtt);
+                element.removeEventListener(`mouseenter`, hoverThreeDestroyer);
+                element.removeEventListener(`mouseleave`, hoverFourDestroyer);
                 console.log("op");
                 const array__ = document.querySelectorAll(`.${playerName}`)
                 array__.forEach(e => {
-                 e.removeEventListener(`mouseenter`, att);
-                 e.removeEventListener(`mouseleave`, btt);
-                 e.removeEventListener(`mouseenter`, ctt);
-                 e.removeEventListener(`mouseleave`, dtt);
+                 e.removeEventListener(`mouseenter`, hoverOneDestroyer);
+                 e.removeEventListener(`mouseleave`, hoverTwoDestroyer);
+                 e.removeEventListener(`mouseenter`, hoverThreeDestroyer);
+                 e.removeEventListener(`mouseleave`, hoverFourDestroyer);
                 });
                 resolve({ var: "Hello Steve" });
                 return true;
             };
         });
     });
-
-    // but.addEventListener(`click`, () =>{
-    //     resolve({ var: "Hello Steve" });
-    // });
 });
 
 
@@ -365,7 +527,7 @@ return new Promise((resolve, reject) => {
 
 
     async function result() {
-        const first = await humanPlacementDestroyer();
+        const first = await humanPlacementDestroyer(`Destroyer`);
         console.log(first);
         // const array__ = document.querySelectorAll(`.${playerName}`)
         // array__.forEach(e  => {
