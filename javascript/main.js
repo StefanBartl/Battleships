@@ -131,6 +131,7 @@ function hoverThreeCarrier (id) {hovering(false, true, 5, id)};
 function hoverFourCarrier (id) {hovering(false, false, 5, id)};
 
 //#endregion
+localStorage.Horizontal = `true`;
 
 function humanPlacement(type, playerName, shipCounter) {
 
@@ -139,27 +140,27 @@ return new Promise((resolve, reject) => {
 
     const fieldArray = document.querySelectorAll(`.${playerName}`)
     fieldArray.forEach(element => {
-        let horizontal = true;
         element.style.pointerEvents = `all`;
         let fieldNumberString = element.getAttribute(`data-fieldID`);
         let fieldNumberInteger = parseInt(fieldNumberString);
         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
 
-
+        // ! Event-Listener to fullfill placement for hover effect
         // ? Destroyer
         if(type === `Destroyer`){
             // ? Preparations
+            let lockHorizontal = false;
+            let lockVertical = true;
            function a(){hoverOneDestroyer(fieldID)};
            function b(){hoverTwoDestroyer(fieldID)};
            function c(){hoverThreeDestroyer(fieldID)};
            function d(){hoverFourDestroyer(fieldID)};
 
            // ? Start adding listener 
-            if(horizontal === true && fieldNumberString[1] !== `0`){
+            if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`){
                 element.addEventListener(`mouseenter`, a);
                 element.addEventListener(`mouseleave`, b);
             };
-
 
             document.addEventListener(`keyup`, (event) => {
                     if(event.code === `Space`){
@@ -172,32 +173,42 @@ return new Promise((resolve, reject) => {
                         element.removeEventListener(`mouseleave`, d);
 
                         // ? Attach new listeners depending on the direction
-                        if(horizontal === true && fieldNumberInteger < 91){
+                        if(localStorage.Horizontal === `true` && fieldNumberInteger < 91){
                             element.addEventListener(`mouseenter`, c);
                             element.addEventListener(`mouseleave`, d);
+                            if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                                localStorage.Horizontal = false;
+                               };
                         };
-                        if(horizontal === false && fieldNumberString[1] !== `0`){
+                        if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0`){
                                 element.addEventListener(`mouseenter`, a);
                                 element.addEventListener(`mouseleave`, b);
+                                if(fieldNumberInteger === 1 && lockVertical === false) {
+                                    localStorage.Horizontal = true;
+                                   };
                            }; 
+                        // ? Toggle direction locker 
+                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                        lockVertical === false ? lockVertical = true : lockVertical = false;
 
-                        // ? Toggle horizontal pointer and return
-                        horizontal === true ? horizontal = false : horizontal = true;
                         return;
                     };});
         };
 
         // ? Submarine
         if(type === `Submarine`){
+            let lockHorizontal = false;
+            let lockVertical = true;
             function e(){hoverOneSubmarine(fieldID)};
             function f(){hoverTwoSubmarine(fieldID)};
             function g(){hoverThreeSubmarine(fieldID)};
             function h(){hoverFourSubmarine(fieldID)};
  
-            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+            if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
                 element.addEventListener(`mouseenter`, e);
                 element.addEventListener(`mouseleave`, f);
             };
+
  
              document.addEventListener(`keyup`, (event) => {
                 if(event.code === `Space`){
@@ -208,69 +219,75 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, g);
                     element.removeEventListener(`mouseleave`, h);
 
-                    if(horizontal === true && fieldNumberInteger < 81){
+                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 81){
                         element.addEventListener(`mouseenter`, g);
                         element.addEventListener(`mouseleave`, h);
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                           };
                     };
-                    if(horizontal === false && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9`){
+                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9`){
                         element.addEventListener(`mouseenter`, e);
                         element.addEventListener(`mouseleave`, f);
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                           };
                        }; 
-
-                    horizontal === true ? horizontal = false : horizontal = true;
+                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                       lockVertical === false ? lockVertical = true : lockVertical = false;
                     return;
                 };});
         };
          
-
         // ? Cruiser
         if(type === `Cruiser`){
+            let lockHorizontal = false;
+            let lockVertical = true;
             function i(){hoverOneCruiser(fieldID)};
             function j(){hoverTwoCruiser(fieldID)};
             function k(){hoverThreeCruiser(fieldID)};
             function l(){hoverFourCruiser(fieldID)};
- 
-            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
+            if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
                 element.addEventListener(`mouseenter`, i);
                 element.addEventListener(`mouseleave`, j);
             };
 
- 
              document.addEventListener(`keyup`, (event) => {
                 if(event.code === `Space`){
-                    event.preventDefault();
-                    
-                    // ? Remove all attached listeners
+                    event.preventDefault();              
                     element.removeEventListener(`mouseenter`, i);
                     element.removeEventListener(`mouseleave`, j);
                     element.removeEventListener(`mouseenter`, k);
                     element.removeEventListener(`mouseleave`, l);
-
-                    // ? Attach new listeners depending on the direction
-                    if(horizontal === true && fieldNumberInteger < 71){
+                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 71){
                         element.addEventListener(`mouseenter`, k);
                         element.addEventListener(`mouseleave`, l);
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                           };
                     };
-                    if(horizontal === false && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
-                            element.addEventListener(`mouseenter`, i);
-                            element.addEventListener(`mouseleave`, j);
-                       }; 
-
-                    // ? Toggle horizontal pointer and return
-                    horizontal === true ? horizontal = false : horizontal = true;
-                    return;
+                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+                        element.addEventListener(`mouseenter`, i);
+                        element.addEventListener(`mouseleave`, j);
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                           };
+                    }; 
+                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                         return;
                 };});
         };
 
-
         // ? Battleship
         if(type === `Battleship`){
+            let lockHorizontal = false;
+            let lockVertical = true;
             function m(){hoverOneBattleship(fieldID)};
             function n(){hoverTwoBattleship(fieldID)};
             function o(){hoverThreeBattleship(fieldID)};
             function p(){hoverFourBattleship(fieldID)};
  
-            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
+            if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
                 element.addEventListener(`mouseenter`, m);
                 element.addEventListener(`mouseleave`, n);
             };
@@ -284,29 +301,36 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, o);
                     element.removeEventListener(`mouseleave`, p);
 
-                    if(horizontal === true && fieldNumberInteger < 61){
+                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 61){
                         element.addEventListener(`mouseenter`, o);
                         element.addEventListener(`mouseleave`, p);
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                           };
                     };
-                    if(horizontal === false && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
-                            element.addEventListener(`mouseenter`, m);
-                            element.addEventListener(`mouseleave`, n);
-                       }; 
-
-                    horizontal === true ? horizontal = false : horizontal = true;
-                    return;
+                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
+                        element.addEventListener(`mouseenter`, m);
+                        element.addEventListener(`mouseleave`, n);
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                           };
+                    }; 
+                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                       lockVertical === false ? lockVertical = true : lockVertical = false;
+                   return;
                 };});
         };
 
         // ? Carrier
         if(type === `Carrier`){
-    
+            let lockHorizontal = false;
+            let lockVertical = true;
             function q(){hoverOneCarrier(fieldID)};
             function r(){hoverTwoCarrier(fieldID)};
             function s(){hoverThreeCarrier(fieldID)};
             function t(){hoverFourCarrier(fieldID)};           
  
-            if(horizontal === true && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `6`){
+            if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
                 element.addEventListener(`mouseenter`, q);
                 element.addEventListener(`mouseleave`, r);
             };
@@ -323,17 +347,23 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, s);
                     element.removeEventListener(`mouseleave`, t);
 
-                    if(horizontal === true && fieldNumberInteger < 51){
+                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 51){
                         element.addEventListener(`mouseenter`, s);
                         element.addEventListener(`mouseleave`, t);
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                           };
                     };
-                    if(horizontal === false && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7` && fieldNumberString[1] !== `6`){
+                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
                             element.addEventListener(`mouseenter`, q);
                             element.addEventListener(`mouseleave`, r);
+                            if(fieldNumberInteger === 1 && lockVertical === false) {
+                                localStorage.Horizontal = true;
+                               };
                        }; 
-
-                    horizontal === true ? horizontal = false : horizontal = true;
-                    return;
+                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                       lockVertical === false ? lockVertical = true : lockVertical = false;
+                       return;
                 };});
         };
 
@@ -341,106 +371,117 @@ return new Promise((resolve, reject) => {
          // ! Event-Listener to fullfill placement
         if(type === `Destroyer`){
             element.addEventListener(`click`, () => {
-                if(horizontal === true ){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 1]);
                         console.log("Destroyer horizontal placed.");
                     };
-                    resolve(true);
-                    return true;
                 };
-                if(horizontal === false){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 1, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Destroyer vertical placed.");
                     };
-                    resolve(true);
-                    return true;
                 };
+                // ? Finish
+                element.removeEventListener(`mouseenter`, a);
+                element.removeEventListener(`mouseleave`, b);
+                element.removeEventListener(`mouseenter`, c);
+                element.removeEventListener(`mouseleave`, d);
+                resolve(true);
+                return true;
             });
         };
 
         if(type === `Submarine`){
             element.addEventListener(`click`, () => {
-                if(horizontal === true){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 2]);
                         console.log("Submarine horizontal placed");
                     };
-                    resolve(true);
-                    return true;
                 };
-                if(horizontal === false){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 2, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Submarine vertical placed");
                     };
-                    resolve(true);
-                    return true;
                 };
+                element.removeEventListener(`mouseenter`, e);
+                element.removeEventListener(`mouseleave`, f);
+                element.removeEventListener(`mouseenter`, g);
+                element.removeEventListener(`mouseleave`, h);
+                resolve(true);
+                return true;
             });
         };
 
         if(type === `Cruiser`){
             element.addEventListener(`click`, () => {
-                if(horizontal === true){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
-                        humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 3]);
+                        humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 2]);
                         console.log("Cruiser horizontal placed");
                     };
-                    resolve(true);
-                    return true;
                 };
-                if(horizontal === false){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
-                        humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 3, parseInt(element.getAttribute(`data-fieldx`))]);
+                        humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 2, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Cruiser vertical placed");
                     };
-                    resolve(true);
-                    return true;
                 };
+            element.removeEventListener(`mouseenter`, i);
+            element.removeEventListener(`mouseleave`, j);
+            element.removeEventListener(`mouseenter`, k);
+            element.removeEventListener(`mouseleave`, l);
+            resolve(true);
+            return true;
             });
         };
 
         if(type === `Battleship`){
             element.addEventListener(`click`, () => {
-                if(horizontal === true){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
-                        humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 4]);
+                        humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 3]);
                         console.log("Battleship horizontal placed");
                     };
-                    resolve(true);
-                    return true;
                 };
-                if(horizontal === false){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
-                    humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 4, parseInt(element.getAttribute(`data-fieldx`))]);
+                    humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 3, parseInt(element.getAttribute(`data-fieldx`))]);
                     console.log("Battleship vertical placed");
                     };
-                    resolve(true);
-                    return true;
                 };
+                element.removeEventListener(`mouseenter`, m);
+                element.removeEventListener(`mouseleave`, n);
+                element.removeEventListener(`mouseenter`, o);
+                element.removeEventListener(`mouseleave`, p);
+                resolve(true);
+                return true;
             });
         };
 
         if(type === `Carrier`){
             element.addEventListener(`click`, () => {
-                if(horizontal === true){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
-                        humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 5]);
+                        humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 4]);
                         console.log("Carrier horizontal placed");
                     };
-                    resolve(true);
-                    return true;
                 };
-                if(horizontal === false){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
-                        humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 5, parseInt(element.getAttribute(`data-fieldx`))]);
+                        humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 4, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Carrier vertical placed");
                     };
-                    resolve(true);
-                    return true;
                 };
+                element.removeEventListener(`mouseenter`, q);
+                element.removeEventListener(`mouseleave`, r);
+                element.removeEventListener(`mouseenter`, s);
+                element.removeEventListener(`mouseleave`, t);
+                resolve(true);
+                return true;
             });
         };
 
