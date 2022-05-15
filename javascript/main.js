@@ -183,18 +183,21 @@ return new Promise((resolve, reject) => {
                                 };
                            }; 
                         // ? Toggle direction locker 
-                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
-                        lockVertical === false ? lockVertical = true : lockVertical = false;
+                        if(fieldNumberInteger === 1){
+                            lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                            lockVertical === false ? lockVertical = true : lockVertical = false;
+                        };
+
                  console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
                         return;
-            };});
+            };}
+            );
         };
 
         // ? Submarine
         if(type === `Submarine`){
             let lockHorizontal = false;
             let lockVertical = true;
-
             function addSubmarine () {
                 if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
@@ -255,8 +258,10 @@ return new Promise((resolve, reject) => {
                             localStorage.Horizontal = false;
                         };
                        }; 
-                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
-                       lockVertical === false ? lockVertical = true : lockVertical = false;
+                       if(fieldNumberInteger === 1){
+                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                        lockVertical === false ? lockVertical = true : lockVertical = false;
+                    };
                     console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
                        
                 };});
@@ -296,38 +301,40 @@ return new Promise((resolve, reject) => {
                 element.addEventListener(`mouseleave`, j);
                 element.addEventListener(`click`, addCruiser);
             };
-            if(localStorage.Horizontal === `false` && fieldNumberInteger < 71){
+            if(localStorage.Horizontal === `false` && fieldNumberInteger < 81){
                 element.addEventListener(`mouseenter`, k);
                 element.addEventListener(`mouseleave`, l);
                 element.addEventListener(`click`, addCruiser);
             };
-             document.addEventListener(`keyup`, (event) => {
+            document.addEventListener(`keyup`, (event) => {
                 if(event.code === `Space`){
-                    event.preventDefault();              
-                    element.removeEventListener(`mouseenter`, i);
-                    element.removeEventListener(`mouseleave`, j);
-                    element.removeEventListener(`mouseenter`, k);
-                    element.removeEventListener(`mouseleave`, l);
+                    event.preventDefault();                  
+                    element.removeEventListener(`mouseenter`, e);
+                    element.removeEventListener(`mouseleave`, f);
+                    element.removeEventListener(`mouseenter`, g);
+                    element.removeEventListener(`mouseleave`, h);
                     element.removeEventListener(`click`, addCruiser);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 71 && cruiserFinished === false){
-                        element.addEventListener(`mouseenter`, k);
-                        element.addEventListener(`mouseleave`, l);
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 81 && submarineFinished === false){
+                        element.addEventListener(`mouseenter`, g);
+                        element.addEventListener(`mouseleave`, h);
                         element.addEventListener(`click`, addCruiser);
                         if(fieldNumberInteger === 1 && lockVertical === false) {
                             localStorage.Horizontal = true;
                         };
                     };
-                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && cruiserFinished === true){
-                        element.addEventListener(`mouseenter`, i);
-                        element.addEventListener(`mouseleave`, j);
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9` && submarineFinished === false){
+                        element.addEventListener(`mouseenter`, e);
+                        element.addEventListener(`mouseleave`, f);
                         element.addEventListener(`click`, addCruiser);
                         if(fieldNumberInteger === 1 && lockHorizontal === false) {
-                            localStorage.Horizontal = false;
+                            localStorage.Horizontal = true;
                         };
-                    }; 
-                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
-                       lockVertical === false ? lockVertical = true : lockVertical = false;
-                       console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);  
+                       }; 
+                       if(fieldNumberInteger === 1){
+                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                        lockVertical === false ? lockVertical = true : lockVertical = false;
+                    };
+                    console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
                        
                 };});
         };
@@ -336,7 +343,6 @@ return new Promise((resolve, reject) => {
         if(type === `Battleship`){
             let lockHorizontal = false;
             let lockVertical = true;
-
             function addBattleship () {
                 if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
@@ -368,11 +374,12 @@ return new Promise((resolve, reject) => {
                 element.addEventListener(`mouseleave`, n);
                 element.addEventListener(`click`, addBattleship);
             };
-            if(localStorage.Horizontal === `false` && fieldNumberInteger < 61){
+            if(localStorage.Horizontal === `false` && fieldNumberInteger < 71){
                 element.addEventListener(`mouseenter`, o);
                 element.addEventListener(`mouseleave`, p);
                 element.addEventListener(`click`, addBattleship);
             };
+            
              document.addEventListener(`keyup`, (event) => {
                 if(event.code === `Space`){
                     event.preventDefault();  
@@ -381,7 +388,7 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, o);
                     element.removeEventListener(`mouseleave`, p);
                     element.removeEventListener(`click`, addBattleship);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 61 && battleshipFinished === false){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 71 && battleshipFinished === false){
                         element.addEventListener(`mouseenter`, o);
                         element.addEventListener(`mouseleave`, p);
                         element.addEventListener(`click`, addBattleship);
@@ -397,8 +404,10 @@ return new Promise((resolve, reject) => {
                             localStorage.Horizontal = false;
                         };
                     }; 
-                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
-                       lockVertical === false ? lockVertical = true : lockVertical = false;
+                    if(fieldNumberInteger === 1){
+                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                        lockVertical === false ? lockVertical = true : lockVertical = false;
+                    };
                    console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
                        
                 };});
@@ -439,7 +448,7 @@ return new Promise((resolve, reject) => {
                 element.addEventListener(`mouseleave`, r);
                 element.addEventListener(`click`, addCarrier);
             };
-            if(localStorage.Horizontal === `false` && fieldNumberInteger < 51){
+            if(localStorage.Horizontal === `false` && fieldNumberInteger < 61){
                 element.addEventListener(`mouseenter`, s);
                 element.addEventListener(`mouseleave`, t);
                 element.addEventListener(`click`, addCarrier);
@@ -452,7 +461,7 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, s);
                     element.removeEventListener(`mouseleave`, t);
                     element.removeEventListener(`click`, addCarrier);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 51  && carrierFinished === false){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 61  && carrierFinished === false){
                         element.addEventListener(`mouseenter`, s);
                         element.addEventListener(`mouseleave`, t);
                         element.addEventListener(`click`, addCarrier);
@@ -468,8 +477,10 @@ return new Promise((resolve, reject) => {
                                 localStorage.Horizontal = false;
                             };
                        }; 
-                       lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
-                       lockVertical === false ? lockVertical = true : lockVertical = false;
+                       if(fieldNumberInteger === 1){
+                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
+                        lockVertical === false ? lockVertical = true : lockVertical = false;
+                    };
                        console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
                        
                 };});
