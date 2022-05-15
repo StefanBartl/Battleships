@@ -36,6 +36,7 @@ todo storyline & level system
 //#endregion
 
 
+
 MainGameLoop = (playerName) => {
   
   // ! Argument validation
@@ -67,35 +68,17 @@ MainGameLoop = (playerName) => {
 //   document.body.appendChild(but);
 
 
-
-
-localStorage.Horizontal = `false`;
-
 function humanPlacement(type, playerName, shipCounter) {
+    
+    localStorage.Horizontal = `true`;
+    console.log(`Local storage:`);
+    console.log(localStorage.Horizontal);
+
     const fieldArray = document.querySelectorAll(`.${playerName}`)
 
 return new Promise((resolve, reject) => {
 
-    function a(){hovering(playerName, true, true, 2, fieldID)};
-    function b(){hovering(playerName, true, false, 2, fieldID)};
-    function c(){hovering(playerName, false, true, 2, fieldID)};
-    function d(){hovering(playerName, false, false, 2, fieldID)};
-    function e(){hovering(playerName, true, true, 3, fieldID)};
-    function f(){hovering(playerName, true, false, 3, fieldID)};
-    function g(){hovering(playerName, false, true, 3, fieldID)};
-    function h(){hovering(playerName, false, false, 3, fieldID)}; 
-    function i(){hovering(playerName, true, true, 3, fieldID)};
-    function j(){hovering(playerName, true, false, 3, fieldID)};
-    function k(){hovering(playerName, false, true, 3, fieldID)};
-    function l(){hovering(playerName, false, false, 3, fieldID)};
-    function m(){hovering(playerName, true, true, 4, fieldID)};
-    function n(){hovering(playerName, true, false, 4, fieldID)};
-    function o(){hovering(playerName, false, true, 4, fieldID)};
-    function p(){hovering(playerName, false, false, 4, fieldID)};
-    function q(){hovering(playerName, true, true, 5, fieldID)};
-    function r(){hovering(playerName, true, false, 5, fieldID)};
-    function s(){hovering(playerName, false, true, 5, fieldID)};
-    function t(){hovering(playerName, false, false, 5, fieldID)};   
+
 
     fieldArray.forEach(element => {
         element.style.pointerEvents = `all`;
@@ -103,6 +86,36 @@ return new Promise((resolve, reject) => {
         let fieldNumberInteger = parseInt(fieldNumberString);
         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
 
+        function a(){hovering(playerName, true, true, 2, fieldID)};
+        function b(){hovering(playerName, true, false, 2, fieldID)};
+        function c(){hovering(playerName, false, true, 2, fieldID)};
+        function d(){hovering(playerName, false, false, 2, fieldID)};
+        function e(){hovering(playerName, true, true, 3, fieldID)};
+        function f(){hovering(playerName, true, false, 3, fieldID)};
+        function g(){hovering(playerName, false, true, 3, fieldID)};
+        function h(){hovering(playerName, false, false, 3, fieldID)}; 
+        function i(){hovering(playerName, true, true, 3, fieldID)};
+        function j(){hovering(playerName, true, false, 3, fieldID)};
+        function k(){hovering(playerName, false, true, 3, fieldID)};
+        function l(){hovering(playerName, false, false, 3, fieldID)};
+        function m(){hovering(playerName, true, true, 4, fieldID)};
+        function n(){hovering(playerName, true, false, 4, fieldID)};
+        function o(){hovering(playerName, false, true, 4, fieldID)};
+        function p(){hovering(playerName, false, false, 4, fieldID)};
+        function q(){hovering(playerName, true, true, 5, fieldID)};
+        function r(){hovering(playerName, true, false, 5, fieldID)};
+        function s(){hovering(playerName, false, true, 5, fieldID)};
+        function t(){hovering(playerName, false, false, 5, fieldID)};   
+        remove = () => {
+            const fy = document.querySelectorAll(`.${playerName}`)
+            fy.forEach(e => {
+                e.removeEventListener(`mouseenter`, a);
+                e.removeEventListener(`mouseleave`, b);
+                e.removeEventListener(`mouseenter`, c);
+                e.removeEventListener(`mouseleave`, d);
+                e.classList.remove(`placingHover`);
+            });
+        };
         // ! Event-Listener to fullfill placement for hover effect
         // ? Destroyer
         if(type === `Destroyer`){
@@ -111,26 +124,19 @@ return new Promise((resolve, reject) => {
             let lockVertical = true;
 
            function addDestroyer () {
-            if(localStorage.Horizontal === `false`){
+            if(localStorage.Horizontal === `true`){
                 if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                     humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 1]);
                     console.log("Destroyer horizontal placed.");
                 };
             };
-            if(localStorage.Horizontal === `true`){
+            if(localStorage.Horizontal === `false`){
                 if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                     humanGameboard.placement(`Destroyer`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 1, parseInt(element.getAttribute(`data-fieldx`))]);
                     console.log("Destroyer vertical placed.");
                 };
             };
             // ? Finish
-            fieldArray.forEach(e => {
-                e.removeEventListener(`mouseenter`, a);
-                e.removeEventListener(`mouseleave`, b);
-                e.removeEventListener(`mouseenter`, c);
-                e.removeEventListener(`mouseleave`, d);
-                e.classList.remove(`placingHover`);
-            });
             resolve(true);
             return true;
             };
@@ -160,21 +166,21 @@ return new Promise((resolve, reject) => {
                         element.removeEventListener(`click`, addDestroyer);
 
                         // ? Attach new listeners depending on the direction
-                        if(localStorage.Horizontal === `true` && fieldNumberInteger < 91){
+                        if(localStorage.Horizontal === `false` && fieldNumberInteger < 91){
                             element.addEventListener(`mouseenter`, c);
                             element.addEventListener(`mouseleave`, d);
                             element.addEventListener(`click`, addDestroyer);
-                            if(fieldNumberInteger === 1 && lockHorizontal === false) {
-                                localStorage.Horizontal = false;
-                               };
+                            if(fieldNumberInteger === 1 && lockVertical === false) {
+                              localStorage.Horizontal = true;
+                            };
                         };
-                        if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0`){
+                        if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`){
                                 element.addEventListener(`mouseenter`, a);
                                 element.addEventListener(`mouseleave`, b);
                                 element.addEventListener(`click`, addDestroyer);
-                                if(fieldNumberInteger === 1 && lockVertical === false) {
-                                    localStorage.Horizontal = true;
-                                   };
+                                if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                                    localStorage.Horizontal = false;
+                                };
                            }; 
                         // ? Toggle direction locker 
                         lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
@@ -190,13 +196,13 @@ return new Promise((resolve, reject) => {
             let lockVertical = true;
 
             function addSubmarine () {
-                if(localStorage.Horizontal === `false`){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 2]);
                         console.log("Submarine  horizontal placed.");
                     };
                 };
-                if(localStorage.Horizontal === `true`){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Submarine`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 2, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Submarine vertical placed.");
@@ -232,21 +238,21 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, g);
                     element.removeEventListener(`mouseleave`, h);
                     element.removeEventListener(`click`, addSubmarine);
-                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 81){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 81){
                         element.addEventListener(`mouseenter`, g);
                         element.addEventListener(`mouseleave`, h);
                         element.addEventListener(`click`, addSubmarine);
-                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
-                            localStorage.Horizontal = false;
-                           };
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                        };
                     };
-                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9`){
                         element.addEventListener(`mouseenter`, e);
                         element.addEventListener(`mouseleave`, f);
                         element.addEventListener(`click`, addSubmarine);
-                        if(fieldNumberInteger === 1 && lockVertical === false) {
-                            localStorage.Horizontal = true;
-                           };
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                        };
                        }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
@@ -259,13 +265,13 @@ return new Promise((resolve, reject) => {
             let lockHorizontal = false;
             let lockVertical = true;
             function addCruiser () {
-                if(localStorage.Horizontal === `false`){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 2]);
                         console.log("Cruiser horizontal placed.");
                     };
                 };
-                if(localStorage.Horizontal === `true`){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Cruiser`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 2, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Cruiser vertical placed.");
@@ -300,21 +306,21 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, k);
                     element.removeEventListener(`mouseleave`, l);
                     element.removeEventListener(`click`, addCruiser);
-                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 71){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 71){
                         element.addEventListener(`mouseenter`, k);
                         element.addEventListener(`mouseleave`, l);
                         element.addEventListener(`click`, addCruiser);
-                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
-                            localStorage.Horizontal = false;
-                           };
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                        };
                     };
-                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
                         element.addEventListener(`mouseenter`, i);
                         element.addEventListener(`mouseleave`, j);
                         element.addEventListener(`click`, addCruiser);
-                        if(fieldNumberInteger === 1 && lockVertical === false) {
-                            localStorage.Horizontal = true;
-                           };
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                        };
                     }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
@@ -328,13 +334,13 @@ return new Promise((resolve, reject) => {
             let lockVertical = true;
 
             function addBattleship () {
-                if(localStorage.Horizontal === `false`){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 3]);
                         console.log("Battleship horizontal placed.");
                     };
                 };
-                if(localStorage.Horizontal === `true`){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Battleship`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 3, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Battleship vertical placed.");
@@ -370,21 +376,21 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, o);
                     element.removeEventListener(`mouseleave`, p);
                     element.removeEventListener(`click`, addBattleship);
-                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 61){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 61){
                         element.addEventListener(`mouseenter`, o);
                         element.addEventListener(`mouseleave`, p);
                         element.addEventListener(`click`, addBattleship);
-                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
-                            localStorage.Horizontal = false;
-                           };
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                        };
                     };
-                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
                         element.addEventListener(`mouseenter`, m);
                         element.addEventListener(`mouseleave`, n);
                         element.addEventListener(`click`, addBattleship);
-                        if(fieldNumberInteger === 1 && lockVertical === false) {
-                            localStorage.Horizontal = true;
-                           };
+                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                            localStorage.Horizontal = false;
+                        };
                     }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
@@ -397,13 +403,13 @@ return new Promise((resolve, reject) => {
             let lockHorizontal = false;
             let lockVertical = true;
             function addCarrier () {
-                if(localStorage.Horizontal === `false`){
+                if(localStorage.Horizontal === `true`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`)) + 4]);
                         console.log("Carrier horizontal placed.");
                     };
                 };
-                if(localStorage.Horizontal === `true`){
+                if(localStorage.Horizontal === `false`){
                     if(localStorage.HumanPlacementShipCounter === `${shipCounter}`){
                         humanGameboard.placement(`Carrier`, [parseInt(element.getAttribute(`data-fieldy`)), parseInt(element.getAttribute(`data-fieldx`))], [parseInt(element.getAttribute(`data-fieldy`)) + 4, parseInt(element.getAttribute(`data-fieldx`))]);
                         console.log("Carrier vertical placed.");
@@ -439,21 +445,21 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, s);
                     element.removeEventListener(`mouseleave`, t);
                     element.removeEventListener(`click`, addCarrier);
-                    if(localStorage.Horizontal === `true` && fieldNumberInteger < 51){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 51){
                         element.addEventListener(`mouseenter`, s);
                         element.addEventListener(`mouseleave`, t);
                         element.addEventListener(`click`, addCarrier);
-                        if(fieldNumberInteger === 1 && lockHorizontal === false) {
-                            localStorage.Horizontal = false;
-                           };
+                        if(fieldNumberInteger === 1 && lockVertical === false) {
+                            localStorage.Horizontal = true;
+                        };
                     };
-                    if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
                             element.addEventListener(`mouseenter`, q);
                             element.addEventListener(`mouseleave`, r);
                             element.addEventListener(`click`, addCarrier);
-                            if(fieldNumberInteger === 1 && lockVertical === false) {
-                                localStorage.Horizontal = true;
-                               };
+                            if(fieldNumberInteger === 1 && lockHorizontal === false) {
+                                localStorage.Horizontal = false;
+                            };
                        }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
