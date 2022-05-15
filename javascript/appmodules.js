@@ -310,35 +310,6 @@ function hovering (playerName, horizontal, adding,  length, basis){
     return true;
 };
 
-//#region  Helper functions for hover-effect in human player placement
-function hoverOneDestroyer (playerName, id) {hovering(playerName, true, true, 2, id)};
-function hoverTwoDestroyer (playerName, id){hovering(playerName, true, false, 2, id)};
-function hoverThreeDestroyer (playerName, id) {hovering(playerName, false, true, 2, id)};
-function hoverFourDestroyer (playerName, id) {hovering(playerName, false, false, 2, id)};
-
-function hoverOneSubmarine (playerName, id) {hovering(playerName, true, true, 3, id)};
-function hoverTwoSubmarine (playerName, id){hovering(playerName, true, false, 3, id)};
-function hoverThreeSubmarine (playerName, id) {hovering(playerName, false, true, 3, id)};
-function hoverFourSubmarine (playerName, id) {hovering(playerName, false, false, 3, id)};
-
-function hoverOneCruiser (playerName, id) {hovering(playerName, true, true, 3, id)};
-function hoverTwoCruiser (playerName, id){hovering(playerName, true, false, 3, id)};
-function hoverThreeCruiser (playerName, id) {hovering(playerName, false, true, 3, id)};
-function hoverFourCruiser (playerName, id) {hovering(playerName, false, false, 3, id)};
-
-function hoverOneBattleship (playerName, id) {hovering(playerName, true, true, 4, id)};
-function hoverTwoBattleship (playerName, id){hovering(playerName, true, false, 4, id)};
-function hoverThreeBattleship (playerName, id) {hovering(playerName, false, true, 4, id)};
-function hoverFourBattleship(playerName, id) {hovering(playerName, false, false, 4, id)};
-
-function hoverOneCarrier (playerName, id) {hovering(playerName, true, true, 5, id)};
-function hoverTwoCarrier (playerName, id){hovering(playerName, true, false, 5, id)};
-function hoverThreeCarrier (playerName, id) {hovering(playerName, false, true, 5, id)};
-function hoverFourCarrier (playerName, id) {hovering(playerName, false, false, 5, id)};
-
-//#endregion
-
-
 //#endregion
 
 

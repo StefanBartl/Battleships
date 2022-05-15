@@ -69,7 +69,7 @@ MainGameLoop = (playerName) => {
 
 
 
-localStorage.Horizontal = `true`;
+localStorage.Horizontal = `false`;
 
 function humanPlacement(type, playerName, shipCounter) {
 
@@ -89,16 +89,21 @@ return new Promise((resolve, reject) => {
             // ? Preparations
             let lockHorizontal = false;
             let lockVertical = true;
-           function a(){hoverOneDestroyer(playerName, fieldID)};
-           function b(){hoverTwoDestroyer(playerName, fieldID)};
-           function c(){hoverThreeDestroyer(playerName, fieldID)};
-           function d(){hoverFourDestroyer(playerName, fieldID)};
+           function a(){hovering(playerName, true, true, 2, fieldID)};
+           function b(){hovering(playerName, true, false, 2, fieldID)};
+           function c(){hovering(playerName, false, true, 2, fieldID)};
+           function d(){hovering(playerName, false, false, 2, fieldID)};
 
            // ? Start adding listener 
             if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`){
                 element.addEventListener(`mouseenter`, a);
                 element.addEventListener(`mouseleave`, b);
             };
+            if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0`){
+                element.addEventListener(`mouseenter`, c);
+                element.addEventListener(`mouseleave`, d);
+            };
+
 
             document.addEventListener(`keyup`, (event) => {
                     if(event.code === `Space`){
@@ -138,16 +143,19 @@ return new Promise((resolve, reject) => {
         if(type === `Submarine`){
             let lockHorizontal = false;
             let lockVertical = true;
-            function e(){hoverOneSubmarine(playerName, fieldID)};
-            function f(){hoverTwoSubmarine(playerName, fieldID)};
-            function g(){hoverThreeSubmarine(playerName, fieldID)};
-            function h(){hoverFourSubmarine(playerName, fieldID)};
+            function e(){hovering(playerName, true, true, 2, fieldID)};
+            function f(){hovering(playerName, true, false, 2, fieldID)};
+            function g(){hovering(playerName, false, true, 2, fieldID)};
+            function h(){hovering(playerName, false, false, 2, fieldID)};
  
             if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
                 element.addEventListener(`mouseenter`, e);
                 element.addEventListener(`mouseleave`, f);
             };
-
+            if(localStorage.Horizontal === `false` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+                element.addEventListener(`mouseenter`, g);
+                element.addEventListener(`mouseleave`, h);
+            };
  
              document.addEventListener(`keyup`, (event) => {
                 if(event.code === `Space`){
@@ -182,10 +190,14 @@ return new Promise((resolve, reject) => {
         if(type === `Cruiser`){
             let lockHorizontal = false;
             let lockVertical = true;
-            function i(){hoverOneCruiser(playerName, fieldID)};
-            function j(){hoverTwoCruiser(playerName, fieldID)};
-            function k(){hoverThreeCruiser(playerName, fieldID)};
-            function l(){hoverFourCruiser(playerName, fieldID)};
+            function i(){hovering(playerName, true, true, 2, fieldID)};
+            function j(){hovering(playerName, true, false, 2, fieldID)};
+            function k(){hovering(playerName, false, true, 2, fieldID)};
+            function l(){hovering(playerName, false, false, 2, fieldID)};
+            if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+                element.addEventListener(`mouseenter`, i);
+                element.addEventListener(`mouseleave`, j);
+            };
             if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
                 element.addEventListener(`mouseenter`, i);
                 element.addEventListener(`mouseleave`, j);
@@ -221,10 +233,10 @@ return new Promise((resolve, reject) => {
         if(type === `Battleship`){
             let lockHorizontal = false;
             let lockVertical = true;
-            function m(){hoverOneBattleship(playerName, fieldID)};
-            function n(){hoverTwoBattleship(playerName, fieldID)};
-            function o(){hoverThreeBattleship(playerName, fieldID)};
-            function p(){hoverFourBattleship(playerName, fieldID)};
+            function m(){hovering(playerName, true, true, 2, fieldID)};
+            function n(){hovering(playerName, true, false, 2, fieldID)};
+            function o(){hovering(playerName, false, true, 2, fieldID)};
+            function p(){hovering(playerName, false, false, 2, fieldID)};
  
             if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
                 element.addEventListener(`mouseenter`, m);
@@ -261,13 +273,13 @@ return new Promise((resolve, reject) => {
         };
 
         // ? Carrier
-        if(type === `Carrier`){
+        if(type === `Carrier`){ 
             let lockHorizontal = false;
             let lockVertical = true;
-            function q(){hoverOneCarrier(playerName, fieldID)};
-            function r(){hoverTwoCarrier(playerName, fieldID)};
-            function s(){hoverThreeCarrier(playerName, fieldID)};
-            function t(){hoverFourCarrier(playerName, fieldID)};           
+            function q(){hovering(playerName, true, true, 2, fieldID)};
+            function r(){hovering(playerName, true, false, 2, fieldID)};
+            function s(){hovering(playerName, false, true, 2, fieldID)};
+            function t(){hovering(playerName, false, false, 2, fieldID)};   
  
             if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
                 element.addEventListener(`mouseenter`, q);
@@ -327,6 +339,7 @@ return new Promise((resolve, reject) => {
                 element.removeEventListener(`mouseleave`, b);
                 element.removeEventListener(`mouseenter`, c);
                 element.removeEventListener(`mouseleave`, d);
+                element.classList.remove(`placingHover`);
                 resolve(true);
                 return true;
             });
@@ -350,6 +363,7 @@ return new Promise((resolve, reject) => {
                 element.removeEventListener(`mouseleave`, f);
                 element.removeEventListener(`mouseenter`, g);
                 element.removeEventListener(`mouseleave`, h);
+                element.classList.remove(`placingHover`);
                 resolve(true);
                 return true;
             });
@@ -373,6 +387,7 @@ return new Promise((resolve, reject) => {
             element.removeEventListener(`mouseleave`, j);
             element.removeEventListener(`mouseenter`, k);
             element.removeEventListener(`mouseleave`, l);
+            element.classList.remove(`placingHover`);
             resolve(true);
             return true;
             });
@@ -396,6 +411,7 @@ return new Promise((resolve, reject) => {
                 element.removeEventListener(`mouseleave`, n);
                 element.removeEventListener(`mouseenter`, o);
                 element.removeEventListener(`mouseleave`, p);
+                element.classList.remove(`placingHover`);
                 resolve(true);
                 return true;
             });
@@ -419,6 +435,7 @@ return new Promise((resolve, reject) => {
                 element.removeEventListener(`mouseleave`, r);
                 element.removeEventListener(`mouseenter`, s);
                 element.removeEventListener(`mouseleave`, t);
+                element.classList.remove(`placingHover`);
                 resolve(true);
                 return true;
             });
