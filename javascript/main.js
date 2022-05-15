@@ -35,7 +35,7 @@ todo storyline & level system
 */
 //#endregion
 
-
+let destroyerFinished = false, submarineFinished = false; cruiserFinished = false; battleshipFinished = false; carrierFinished = false;
 
 MainGameLoop = (playerName) => {
   
@@ -67,10 +67,10 @@ MainGameLoop = (playerName) => {
 //   but.classList.add(`changer`);
 //   document.body.appendChild(but);
 
+localStorage.Horizontal = `true`;
 
 function humanPlacement(type, playerName, shipCounter) {
     
-    localStorage.Horizontal = `true`;
     console.log(`Local storage:`);
     console.log(localStorage.Horizontal);
 
@@ -78,14 +78,13 @@ function humanPlacement(type, playerName, shipCounter) {
 
 return new Promise((resolve, reject) => {
 
-
-
     fieldArray.forEach(element => {
         element.style.pointerEvents = `all`;
         let fieldNumberString = element.getAttribute(`data-fieldID`);
         let fieldNumberInteger = parseInt(fieldNumberString);
         let fieldID = parseInt(element.getAttribute(`data-fieldID`));
 
+        
         function a(){hovering(playerName, true, true, 2, fieldID)};
         function b(){hovering(playerName, true, false, 2, fieldID)};
         function c(){hovering(playerName, false, true, 2, fieldID)};
@@ -137,6 +136,7 @@ return new Promise((resolve, reject) => {
                 };
             };
             // ? Finish
+            destroyerFinished = true;
             resolve(true);
             return true;
             };
@@ -166,7 +166,7 @@ return new Promise((resolve, reject) => {
                         element.removeEventListener(`click`, addDestroyer);
 
                         // ? Attach new listeners depending on the direction
-                        if(localStorage.Horizontal === `false` && fieldNumberInteger < 91){
+                        if(localStorage.Horizontal === `false` && fieldNumberInteger < 91 && destroyerFinished === false){
                             element.addEventListener(`mouseenter`, c);
                             element.addEventListener(`mouseleave`, d);
                             element.addEventListener(`click`, addDestroyer);
@@ -174,7 +174,7 @@ return new Promise((resolve, reject) => {
                               localStorage.Horizontal = true;
                             };
                         };
-                        if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`){
+                        if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && destroyerFinished === false){
                                 element.addEventListener(`mouseenter`, a);
                                 element.addEventListener(`mouseleave`, b);
                                 element.addEventListener(`click`, addDestroyer);
@@ -185,7 +185,7 @@ return new Promise((resolve, reject) => {
                         // ? Toggle direction locker 
                         lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                         lockVertical === false ? lockVertical = true : lockVertical = false;
-
+                 console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
                         return;
             };});
         };
@@ -216,6 +216,7 @@ return new Promise((resolve, reject) => {
                     el.removeEventListener(`mouseleave`, h);
                     el.classList.remove(`placingHover`);
                 });
+                submarineFinished = true;
                 resolve(true);
                 return true;
             };
@@ -238,7 +239,7 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, g);
                     element.removeEventListener(`mouseleave`, h);
                     element.removeEventListener(`click`, addSubmarine);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 81){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 81 && submarineFinished === false){
                         element.addEventListener(`mouseenter`, g);
                         element.addEventListener(`mouseleave`, h);
                         element.addEventListener(`click`, addSubmarine);
@@ -246,7 +247,7 @@ return new Promise((resolve, reject) => {
                             localStorage.Horizontal = true;
                         };
                     };
-                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0`  && fieldNumberString[1] !== `9` && submarineFinished === false){
                         element.addEventListener(`mouseenter`, e);
                         element.addEventListener(`mouseleave`, f);
                         element.addEventListener(`click`, addSubmarine);
@@ -256,7 +257,8 @@ return new Promise((resolve, reject) => {
                        }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
-                    return;
+                    console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
+                       
                 };});
         };
          
@@ -285,6 +287,7 @@ return new Promise((resolve, reject) => {
                     e.removeEventListener(`mouseleave`, l);
                     e.classList.remove(`placingHover`);
                 });
+                cruiserFinished = true;
                 resolve(true);
                 return true;
                 };
@@ -306,7 +309,7 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, k);
                     element.removeEventListener(`mouseleave`, l);
                     element.removeEventListener(`click`, addCruiser);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 71){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 71 && cruiserFinished === false){
                         element.addEventListener(`mouseenter`, k);
                         element.addEventListener(`mouseleave`, l);
                         element.addEventListener(`click`, addCruiser);
@@ -314,7 +317,7 @@ return new Promise((resolve, reject) => {
                             localStorage.Horizontal = true;
                         };
                     };
-                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && cruiserFinished === true){
                         element.addEventListener(`mouseenter`, i);
                         element.addEventListener(`mouseleave`, j);
                         element.addEventListener(`click`, addCruiser);
@@ -324,7 +327,8 @@ return new Promise((resolve, reject) => {
                     }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
-                         return;
+                       console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);  
+                       
                 };});
         };
 
@@ -354,6 +358,7 @@ return new Promise((resolve, reject) => {
                     e.removeEventListener(`mouseleave`, p);
                     e.classList.remove(`placingHover`);
                 });
+                battleshipFinished = true;
                 resolve(true);
                 return true;
                 };
@@ -376,7 +381,7 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, o);
                     element.removeEventListener(`mouseleave`, p);
                     element.removeEventListener(`click`, addBattleship);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 61){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 61 && battleshipFinished === false){
                         element.addEventListener(`mouseenter`, o);
                         element.addEventListener(`mouseleave`, p);
                         element.addEventListener(`click`, addBattleship);
@@ -384,7 +389,7 @@ return new Promise((resolve, reject) => {
                             localStorage.Horizontal = true;
                         };
                     };
-                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && battleshipFinished === false){
                         element.addEventListener(`mouseenter`, m);
                         element.addEventListener(`mouseleave`, n);
                         element.addEventListener(`click`, addBattleship);
@@ -394,7 +399,8 @@ return new Promise((resolve, reject) => {
                     }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
-                   return;
+                   console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
+                       
                 };});
         };
 
@@ -423,6 +429,7 @@ return new Promise((resolve, reject) => {
                     e.removeEventListener(`mouseleave`, t);
                     e.classList.remove(`placingHover`);
                 });
+                carrierFinished = true;
                 resolve(true);
                 return true;
                 };
@@ -445,7 +452,7 @@ return new Promise((resolve, reject) => {
                     element.removeEventListener(`mouseenter`, s);
                     element.removeEventListener(`mouseleave`, t);
                     element.removeEventListener(`click`, addCarrier);
-                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 51){
+                    if(localStorage.Horizontal === `false` && fieldNumberInteger < 51  && carrierFinished === false){
                         element.addEventListener(`mouseenter`, s);
                         element.addEventListener(`mouseleave`, t);
                         element.addEventListener(`click`, addCarrier);
@@ -453,7 +460,7 @@ return new Promise((resolve, reject) => {
                             localStorage.Horizontal = true;
                         };
                     };
-                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`){
+                    if(localStorage.Horizontal === `true` && fieldNumberString[1] !== `0` && fieldNumberString[1] !== `9` && fieldNumberString[1] !== `8` && fieldNumberString[1] !== `7`  && carrierFinished === false){
                             element.addEventListener(`mouseenter`, q);
                             element.addEventListener(`mouseleave`, r);
                             element.addEventListener(`click`, addCarrier);
@@ -463,7 +470,8 @@ return new Promise((resolve, reject) => {
                        }; 
                        lockHorizontal === false ? lockHorizontal = true : lockHorizontal = false;
                        lockVertical === false ? lockVertical = true : lockVertical = false;
-                       return;
+                       console.log(`Changed direction to horizontal ${localStorage.Horizontal}`);
+                       
                 };});
         };
 
